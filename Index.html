@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Padel Beariz</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f4f7f5;color:#173b2a}
+header{background:#176b45;color:white;padding:22px;text-align:center}
+main{max-width:700px;margin:auto;padding:18px}
+.card{background:white;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #0001}
+h1{margin:0 0 6px}
+button{border:0;border-radius:10px;padding:12px 16px;background:#176b45;color:white;font-size:16px}
+select,input{width:100%;box-sizing:border-box;padding:12px;margin:7px 0 14px;border:1px solid #ccc;border-radius:9px}
+.badge{display:inline-block;padding:6px 10px;border-radius:20px;background:#e8f5ed}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🎾 Padel Beariz</h1>
+<div>Reserva tu pista fácilmente</div>
+</header>
+
+<main>
+<div class="card">
+<h2>Reservar pista</h2>
+
+<label>Fecha</label>
+<input id="fecha" type="date">
+
+<label>Hora</label>
+<select id="hora">
+<option>09:00</option>
+<option>10:30</option>
+<option>12:00</option>
+<option>13:30</option>
+<option>15:00</option>
+<option>16:30</option>
+<option>18:00</option>
+<option>19:30</option>
+<option>21:00</option>
+<option>22:30</option>
+</select>
+
+<label>Nombre</label>
+<input id="nombre" placeholder="Tu nombre">
+
+<label>Teléfono</label>
+<input id="telefono" placeholder="Tu teléfono">
+
+<label>Pago</label>
+<select id="pago">
+<option>Efectivo</option>
+<option>Tarjeta</option>
+</select>
+
+<p>Pista 1 · <span class="badge">12 €</span></p>
+
+<button onclick="reservar()">Solicitar reserva</button>
+
+<p id="msg"></p>
+</div>
+
+<div class="card">
+<h2>Horario</h2>
+<p>09:00 – 00:00</p>
+<p>Reservas de 1 hora y 30 minutos.</p>
+<p>El administrador confirma y gestiona las reservas.</p>
+</div>
+</main>
+
+<script>
+const hoy=new Date();
+document.getElementById('fecha').value=hoy.toISOString().slice(0,10);
+
+function reservar(){
+const n=document.getElementById('nombre').value.trim();
+const t=document.getElementById('telefono').value.trim();
+
+if(!n||!t){
+document.getElementById('msg').textContent='Completa nombre y teléfono.';
+return;
+}
+
+document.getElementById('msg').textContent=
+'Solicitud preparada. La conexión con Supabase se añadirá después.';
+}
+</script>
+
+</body>
+</html>
