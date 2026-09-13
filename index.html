@@ -1,987 +1,455 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pádel Beariz</title>
-
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f3f7f4;
-  color:#183526
-}
-header{
-  background:#176b45;
-  color:white;
-  padding:20px;
-  text-align:center
-}
-header h1{margin:0 0 5px}
-main{
-  max-width:900px;
-  margin:auto;
-  padding:15px
-}
-.card{
-  background:white;
-  border-radius:16px;
-  padding:16px;
-  margin:12px 0;
-  box-shadow:0 3px 12px #0001
-}
-.tabs{
-  display:flex;
-  gap:7px;
-  overflow-x:auto;
-  margin-bottom:12px
-}
-button{
-  border:0;
-  border-radius:10px;
-  padding:11px 14px;
-  background:#176b45;
-  color:white;
-  font-weight:bold;
-  cursor:pointer
-}
-button.secondary{background:#68746d}
-button.danger{background:#b3261e}
-button.active{background:#e4a900;color:#111}
-input,select{
-  width:100%;
-  padding:12px;
-  margin:6px 0 13px;
-  border:1px solid #ccd5cf;
-  border-radius:9px;
-  font-size:16px;
-  background:white
-}
-label{
-  display:block;
-  font-weight:bold
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
-  gap:10px
-}
-.slot{
-  background:#e6f5ec;
-  border:1px solid #b9ddc8;
-  border-radius:12px;
-  padding:13px
-}
-.slot.busy{
-  background:#ffe5e5;
-  border-color:#efb0b0
-}
-.small{
-  font-size:13px;
-  color:#68746d
-}
-.hidden{display:none}
-.badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  background:#edf2ee;
-  font-size:12px
-}
-.status{
-  padding:11px;
-  border-radius:10px;
-  background:#fff1c7
-}
-.status.ok{background:#dff4e7}
-.row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  flex-wrap:wrap
-}
-.money{
-  font-size:30px;
-  font-weight:bold
-}
-table{
-  width:100%;
-  border-collapse:collapse
-}
-th,td{
-  padding:8px;
-  border-bottom:1px solid #eee;
-  text-align:left
-}
-.notice{
-  background:#edf5f0
-}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17221b}header{background:#123b2a;color:#fff;padding:18px}.wrap{max-width:980px;margin:auto;padding:16px}h1{margin:0 0 4px}.sub{opacity:.85}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}button{border:0;border-radius:10px;padding:11px 14px;background:#1e7a55;color:#fff;font-weight:700}button.active{background:#f2a900}.danger{background:#b3261e}.card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}.slot.busy{background:#ffe5e5;border-color:#f4b3b3}.small{font-size:13px;color:#68746d}.hidden{display:none}.status{padding:10px;border-radius:10px;background:#fff3cd}.ok{background:#dff4e7}.money{font-size:30px;font-weight:800}input,select{width:100%;padding:11px;border:1px solid #ccd5cf;border-radius:9px;margin:5px 0 10px}label{font-weight:700}.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}@media(max-width:600px){.wrap{padding:10px}.tabs button{flex:1 1 45%}table{font-size:13px}}
 </style>
 </head>
-
 <body>
-
-<header>
-  <h1>🎾 Pádel Beariz</h1>
-  <div>Reservas · Carnets · Ingresos</div>
-</header>
-
-<main>
-
-<div class="card">
-  <div id="cloudStatus" class="status">
-    🟡 Conectando...
-  </div>
-</div>
-
-<div class="card">
-  <div class="row">
-    <div>
-      <b>Acceso:</b>
-      <span id="role" class="badge">Jugador</span>
-    </div>
-
-    <div>
-      <button onclick="loginAdmin()">🔐 Administrador</button>
-      <button class="secondary" onclick="logoutAdmin()">Salir</button>
-    </div>
-  </div>
-
-  <p class="small">
-    Los jugadores pueden solicitar reservas.
-    El administrador puede gestionar reservas, carnets,
-    configuración e ingresos.
-  </p>
-</div>
-
+<header><div class="wrap"><h1>🎾 Pádel Beariz</h1><div class="sub">Reservas · Carnets · Ingresos</div></div></header>
+<main class="wrap">
+<div id="cloudStatus" class="status">🟡 Conectando…</div>
 <div class="tabs">
-
-<button class="active" onclick="openTab('reservas',this)">
-📅 Reservas
-</button>
-
-<button onclick="openTab('nueva',this)">
-➕ Nueva
-</button>
-
-<button id="btnJugadores" onclick="openTab('jugadores',this)">
-👥 Carnets
-</button>
-
-<button id="btnIngresos" onclick="openTab('ingresos',this)">
-💰 Ingresos
-</button>
-
-<button id="btnConfig" onclick="openTab('config',this)">
-⚙️ Configuración
-</button>
-
+<button class="active" onclick="show('reservas',this)">📅 Reservas</button><button onclick="show('nueva',this)">➕ Nueva</button><button class="adminOnly" onclick="show('jugadores',this)">👥 Carnets</button><button class="adminOnly" onclick="show('ingresos',this)">💰 Ingresos</button><button class="adminOnly" onclick="show('config',this)">⚙️ Configuración</button><button onclick="adminLogin()">🔐 Admin</button><button class="adminOnly" onclick="logoutAdmin()">Salir</button>
 </div>
 
-
-<!-- RESERVAS -->
-
-<section id="reservas">
-
+<section id="reservas" class="page">
 <div class="card">
-
 <div class="row">
-
-<div>
-<label>Fecha</label>
-<input id="fechaVista" type="date" onchange="render()">
+<label>Fecha<input id="viewDate" type="date" onchange="renderSlots()"></label>
+<button onclick="setToday()">Hoy</button>
 </div>
-
-<button onclick="hoy()">Hoy</button>
-
 </div>
-
-</div>
-
 <div class="card">
-
 <h2>Horarios</h2>
-
-<div class="small">
-Reservas de <span id="duracionTexto">90</span> minutos
-·
-<span id="precioTexto">12</span> €
+<div class="small">Cada reserva dura <span id="durText">90</span> minutos · Precio €<span id="priceText">12</span></div>
+<div id="slots" class="grid"></div>
 </div>
-
-<div id="horarios" class="grid" style="margin-top:15px"></div>
-
-</div>
-
 </section>
 
-
-<!-- NUEVA RESERVA -->
-
-<section id="nueva" class="hidden">
-
+<section id="nueva" class="page hidden">
 <div class="card">
-
 <h2>➕ Nueva reserva</h2>
-
-<label>Fecha</label>
-<input id="fecha" type="date">
-
-<label>Hora</label>
-<select id="hora"></select>
-
-<label>Nombre</label>
-<input id="nombre" placeholder="Nombre del jugador">
-
-<label>Teléfono</label>
-<input id="telefono" placeholder="Teléfono">
-
-<label>Carnet</label>
-<input id="carnet" placeholder="PB-0001 (opcional)">
-
-<label>Pago</label>
-
-<select id="pago">
-<option>Pendiente</option>
-<option>Efectivo</option>
-<option>Tarjeta</option>
-</select>
-
-<button onclick="reservar()">
-🎾 Solicitar reserva
-</button>
-
-<p id="mensaje"></p>
-
+<label>Fecha<input id="date" type="date"></label>
+<label>Hora<select id="time"></select></label>
+<label>Nombre<input id="player" placeholder="Nombre del jugador"></label>
+<label>Teléfono<input id="phone" inputmode="tel" placeholder="Teléfono"></label>
+<label>Carnet<input id="carnet" placeholder="Número de carnet (opcional)"></label>
+<label>Pago<select id="pay"><option>Pendiente</option><option>Efectivo</option><option>Tarjeta</option></select></label>
+<button onclick="createReservation()">Reservar</button>
 </div>
-
 </section>
 
-
-<!-- JUGADORES -->
-
-<section id="jugadores" class="hidden">
-
+<section id="jugadores" class="page hidden adminOnly">
 <div class="card">
-
-<h2>👥 Jugadores y carnets</h2>
-
-<label>Nombre</label>
-<input id="nuevoJugador" placeholder="Nombre completo">
-
-<button onclick="crearJugador()">
-Crear carnet
-</button>
-
-<div id="listaJugadores" style="margin-top:15px"></div>
-
+<h2>👥 Carnets</h2>
+<p class="small">Los jugadores con carnet aparecen aquí automáticamente cuando hacen una reserva.</p>
 </div>
-
+<div id="players"></div>
 </section>
 
-
-<!-- INGRESOS -->
-
-<section id="ingresos" class="hidden">
-
+<section id="ingresos" class="page hidden adminOnly">
 <div class="card">
-
-<div class="row">
-
-<h2>💰 Ingresos</h2>
-
-<input
-id="mes"
-type="month"
-onchange="renderIngresos"
-style="max-width:180px">
-
+<label>Mes<input id="monthPick" type="month" onchange="renderIncome()"></label>
+<div class="money" id="total">€0.00</div>
+<div class="small" id="count">0 reservas cobradas</div>
 </div>
-
-<div id="total" class="money">€0.00</div>
-
-<p id="cantidad" class="small"></p>
-
-</div>
-
 <div class="card">
-
+<div style="overflow:auto">
 <table>
-
-<thead>
-<tr>
-<th>Fecha</th>
-<th>Hora</th>
-<th>Jugador</th>
-<th>Pago</th>
-<th>Importe</th>
-</tr>
-</thead>
-
-<tbody id="tablaIngresos"></tbody>
-
+<thead><tr><th>Fecha</th><th>Hora</th><th>Jugador</th><th>Pago</th><th>Importe</th></tr></thead>
+<tbody id="incomeRows"></tbody>
 </table>
-
 </div>
-
+</div>
 </section>
 
-
-<!-- CONFIGURACIÓN -->
-
-<section id="config" class="hidden">
-
+<section id="config" class="page hidden adminOnly">
 <div class="card">
-
 <h2>⚙️ Configuración</h2>
-
-<label>Precio (€)</label>
-<input id="precio" type="number" step="0.50">
-
-<label>Duración (minutos)</label>
-<input id="duracion" type="number">
-
-<label>Inicio</label>
-<input id="inicio" type="time">
-
-<label>Fin</label>
-<input id="fin" type="time">
-
-<button onclick="guardarConfig()">
-Guardar configuración
-</button>
-
+<label>Precio (€)<input id="price" type="number" step="0.50"></label>
+<label>Duración (minutos)<input id="duration" type="number" step="30"></label>
+<label>Inicio<input id="start" type="time"></label>
+<label>Fin<input id="end" type="time"></label>
+<button onclick="saveConfig()">Guardar configuración</button>
 </div>
-
 </section>
-
-
-<div class="card notice">
-
-<b>🎾 Pádel Beariz</b>
-
-<p class="small">
-Pista · 90 minutos · 09:00–00:00
-</p>
-
-</div>
-
 </main>
 
-
 <script>
+const SUPABASE_URL='https://jppsqrbpjwulzapyvpim.supabase.co';
+const SUPABASE_KEY='sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
+const API=SUPABASE_URL+'/rest/v1/reservas';
 
-/* =========================
-   SUPABASE
-========================= */
-
-const SUPABASE_URL =
-"https://jppsqrbpjwulzapyvpim.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23";
-
-const API =
-SUPABASE_URL + "/rest/v1/padel_beariz";
-
-
-/* =========================
-   DATOS
-========================= */
-
-const DATOS_INICIALES = {
-
-id:1,
-
+let data={
 reservas:[],
-
-jugadores:[],
-
 price:12,
-
 duration:90,
-
-start:"09:00",
-
-end:"00:00"
-
+start:'09:00',
+end:'00:00'
 };
 
+const today=new Date().toISOString().slice(0,10);
+viewDate.value=today;
+date.value=today;
+monthPick.value=today.slice(0,7);
 
-let data =
-JSON.parse(
-localStorage.getItem("padelBeariz") ||
-JSON.stringify(DATOS_INICIALES)
-);
-
-
-/* =========================
-   ADMIN
-========================= */
-
-function esAdmin(){
-
-return sessionStorage.getItem("padelAdmin")==="1";
-
+function isAdmin(){
+return sessionStorage.getItem('padelAdmin')==='1'
 }
 
-
-function loginAdmin(){
-
-const pin =
-prompt("Introduce el PIN de administrador");
-
-if(pin===null)return;
-
-const correcto =
-localStorage.getItem("padelPin") || "1234";
-
-if(pin===correcto){
-
-sessionStorage.setItem("padelAdmin","1");
-
-aplicarPermisos();
-
-render();
-
-alert("Administrador activado");
-
+function adminLogin(){
+let p=prompt('PIN de administrador:');
+if(p===null)return;
+let saved=localStorage.getItem('padelPin')||'1234';
+if(p===saved){
+sessionStorage.setItem('padelAdmin','1');
+applyRole();
+alert('Administrador activado')
 }else{
-
-alert("PIN incorrecto");
-
+alert('PIN incorrecto')
 }
-
 }
-
 
 function logoutAdmin(){
-
-sessionStorage.removeItem("padelAdmin");
-
-aplicarPermisos();
-
-openTab("reservas");
-
+sessionStorage.removeItem('padelAdmin');
+applyRole();
+show('reservas')
 }
 
-
-function aplicarPermisos(){
-
-const admin=esAdmin();
-
-document.getElementById("role").textContent =
-admin ? "Administrador" : "Jugador";
-
-document.getElementById("btnJugadores").style.display =
-admin ? "" : "none";
-
-document.getElementById("btnIngresos").style.display =
-admin ? "" : "none";
-
-document.getElementById("btnConfig").style.display =
-admin ? "" : "none";
-
+function applyRole(){
+document.querySelectorAll('.adminOnly').forEach(e=>{
+e.style.display=isAdmin()?'':'none'
+})
 }
 
+function show(id,b){
+document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
 
-/* =========================
-   PESTAÑAS
-========================= */
-
-function openTab(id,boton){
-
-if(
-(id==="jugadores" ||
- id==="ingresos" ||
- id==="config") &&
- !esAdmin()
-){
-
-alert("Esta sección es solo para el administrador.");
-
-return;
-
+if(b){
+document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+b.classList.add('active')
 }
 
-document.querySelectorAll("main section")
-.forEach(s=>s.classList.add("hidden"));
+render()
+}
 
-document.getElementById(id)
-.classList.remove("hidden");
+function setToday(){
+viewDate.value=today;
+renderSlots()
+}
 
-document.querySelectorAll(".tabs button")
-.forEach(b=>b.classList.remove("active"));
+function times(){
+let out=[];
+let [h,m]=data.start.split(':').map(Number);
+let [eh,em]=data.end.split(':').map(Number);
+let end=eh*60+em;
 
-if(boton)boton.classList.add("active");
+if(end===0)end=1440;
 
+let cur=h*60+m;
+
+while(cur+Number(data.duration)<=end){
+out.push(
+String(Math.floor(cur/60)).padStart(2,'0')+':'+
+String(cur%60).padStart(2,'0')
+);
+cur+=Number(data.duration)
+}
+
+return out
+}
+
+function esc(v){
+return String(v??'').replace(/[&<>"']/g,m=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[m]))
+}
+
+function renderSlots(){
+let d=viewDate.value;
+
+slots.innerHTML=times().map(t=>{
+let r=data.reservas.find(x=>
+String(x.fecha||'')===d &&
+String(x.hora||'')===t &&
+String(x.estado||'')!=='Cancelada'
+);
+
+return r
+?`<div class="slot busy">
+<b>${t}</b><br>
+🔴 Ocupado<br>
+<span class="small">${esc(r.nombre||'')}</span>
+${isAdmin()?`<br><button class="danger" onclick="cancelar('${esc(r.id)}')">Cancelar</button>`:''}
+</div>`
+:`<div class="slot">
+<b>${t}</b><br>
+🟢 Disponible<br>
+<button onclick="reserveAt('${d}','${t}')">Reservar</button>
+</div>`
+}).join('');
+
+durText.textContent=data.duration;
+priceText.textContent=Number(data.price).toFixed(2)
+}
+
+function reserveAt(d,t){
+date.value=d;
 render();
-
+time.value=t;
+show('nueva')
 }
 
-
-/* =========================
-   FECHA
-========================= */
-
-function fechaLocal(){
-
-const d=new Date();
-
-return d.getFullYear()+"-"+
-
-String(d.getMonth()+1).padStart(2,"0")+"-"+
-
-String(d.getDate()).padStart(2,"0");
-
+async function cargarNube(){
+try{
+let r=await fetch(
+API+'?select=*&order=fecha.asc,hora.asc',
+{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY
 }
-
-
-function hoy(){
-
-document.getElementById("fechaVista").value=
-fechaLocal();
-
-render();
-
 }
-
-
-/* =========================
-   HORARIOS
-========================= */
-
-function obtenerHorarios(){
-
-const resultado=[];
-
-let partes=data.start.split(":");
-
-let minutos =
-Number(partes[0])*60+
-Number(partes[1]);
-
-let finPartes=data.end.split(":");
-
-let fin =
-Number(finPartes[0])*60+
-Number(finPartes[1]);
-
-if(fin===0)fin=1440;
-
-while(
-minutos + Number(data.duration)
-<= fin
-){
-
-resultado.push(
-
-String(Math.floor(minutos/60))
-.padStart(2,"0")
-+
-":"+
-String(minutos%60)
-.padStart(2,"0")
-
 );
 
-minutos += Number(data.duration);
+if(!r.ok)throw Error(await r.text());
 
-}
-
-return resultado;
-
-}
-
-
-/* =========================
-   RESERVAS
-========================= */
-
-function renderHorarios(){
-
-const fecha =
-document.getElementById("fechaVista").value;
-
-const horarios =
-obtenerHorarios();
-
-let html="";
-
-horarios.forEach(hora=>{
-
-const reserva =
-data.reservas.find(
-r=>r.fecha===fecha &&
-r.hora===hora
-);
-
-if(reserva){
-
-html+=`
-
-<div class="slot busy">
-
-<b>${hora}</b>
-
-<br>
-
-🔴 ${esc(reserva.nombre)}
-
-<br>
-
-<span class="badge">
-${esc(reserva.pago)}
-</span>
-
-${
-esAdmin()
-?
-`<br><br>
-<button class="danger"
-onclick="cancelar('${reserva.id}')">
-Cancelar
-</button>`
-:""
-}
-
-</div>
-
-`;
-
-}else{
-
-html+=`
-
-<div class="slot">
-
-<b>${hora}</b>
-
-<br>
-
-🟢 Disponible
-
-<br><br>
-
-<button
-onclick="reservarHora('${fecha}','${hora}')">
-
-Reservar
-
-</button>
-
-</div>
-
-`;
-
-}
-
-});
-
-document.getElementById("horarios")
-.innerHTML=html;
-
-}
-
-
-function reservarHora(fecha,hora){
-
-document.getElementById("fecha").value=fecha;
-
-document.getElementById("hora").value=hora;
-
-openTab("nueva");
-
-}
-
-
-/* =========================
-   CREAR RESERVA
-========================= */
-
-async function reservar(){
-
-const fecha=
-document.getElementById("fecha").value;
-
-const hora=
-document.getElementById("hora").value;
-
-const nombre=
-document.getElementById("nombre")
-.value.trim();
-
-const telefono=
-document.getElementById("telefono")
-.value.trim();
-
-const carnet=
-document.getElementById("carnet")
-.value.trim();
-
-const pago=
-document.getElementById("pago").value;
-
-const mensaje=
-document.getElementById("mensaje");
-
-
-if(!fecha || !hora || !nombre || !telefono){
-
-mensaje.textContent=
-"Completa fecha, hora, nombre y teléfono.";
-
-return;
-
-}
-
-
-const ocupada=
-data.reservas.some(
-r=>r.fecha===fecha &&
-r.hora===hora
-);
-
-if(ocupada){
-
-mensaje.textContent=
-"❌ Ese horario ya está ocupado.";
-
-return;
-
-}
-
-
-data.reservas.push({
-
-id:Date.now().toString(),
-
-fecha:fecha,
-
-hora:hora,
-
-nombre:nombre,
-
-telefono:telefono,
-
-carnet:carnet,
-
-pago:pago,
-
-estado:"Pendiente"
-
-});
-
-
-await guardarDatos();
-
-mensaje.textContent=
-"✅ Reserva realizada correctamente.";
-
-document.getElementById("nombre").value="";
-document.getElementById("telefono").value="";
-document.getElementById("carnet").value="";
-
-}
-
-
-/* =========================
-   CANCELAR
-========================= */
-
-async function cancelar(id){
-
-if(!esAdmin()){
-
-alert("Solo el administrador puede cancelar.");
-
-return;
-
-}
-
-if(!confirm("¿Cancelar esta reserva?"))return;
-
-data.reservas=
-data.reservas.filter(r=>r.id!==id);
-
-await guardarDatos();
-
-}
-
-
-/* =========================
-   JUGADORES
-========================= */
-
-async function crearJugador(){
-
-if(!esAdmin())return;
-
-const nombre=
-document.getElementById("nuevoJugador")
-.value.trim();
-
-if(!nombre){
-
-alert("Escribe el nombre.");
-
-return;
-
-}
-
-data.jugadores.push({
-
-id:Date.now().toString(),
-
-nombre:nombre
-
-});
-
-document.getElementById("nuevoJugador").value="";
-
-await guardarDatos();
-
-}
-
-
-function renderJugadores(){
-
-let html="";
-
-data.jugadores.forEach((j,i)=>{
-
-const carnet=
-"PB-"+String(i+1).padStart(4,"0");
-
-html+=`
-
-<div class="card">
-
-<b>${esc(j.nombre)}</b>
-
-<br>
-
-<span class="badge">
-Carnet ${carnet}
-</span>
-
-</div>
-
-`;
-
-});
-
-document.getElementById("listaJugadores")
-.innerHTML =
-html ||
-"<p class='small'>No hay jugadores registrados.</p>";
-
-}
-
-
-/* =========================
-   INGRESOS
-========================= */
-
-function renderIngresos(){
-
-const mes=
-document.getElementById("mes").value;
-
-const reservas=
-data.reservas.filter(r=>
-r.fecha.startsWith(mes) &&
-r.pago!=="Pendiente"
-);
-
-const total=
-reservas.length *
-Number(data.price);
-
-document.getElementById("total")
-.textContent=
-"€"+total.toFixed(2);
-
-document.getElementById("cantidad")
-.textContent=
-reservas.length+
-" reservas cobradas";
-
-let html="";
-
-reservas.forEach(r=>{
-
-html+=`
-
-<tr>
-
-<td>${r.fecha}</td>
-
-<td>${r.hora}</td>
-
-<td>${esc(r.nombre)}</td>
-
-<td>${esc(r.pago)}</td>
-
-<td>€${Number(data.price).toFixed(2)}</td>
-
-</tr>
-
-`;
-
-});
-
-document.getElementById("tablaIngresos")
-.innerHTML=html;
-
-}
-
-
-/* =========================
-   CONFIGURACIÓN
-========================= */
-
-async function guardarConfig(){
-
-if(!esAdmin())return;
-
-data.price=
-Number(document.getElementById("precio").value)||12;
-
-data.duration=
-Number(document.getElementById("duracion").value)||90;
-
-data.start=
-document.getElementById("inicio").value||"09:00";
-
-data.end=
-document.getElementById("fin").value||"00:00";
-
-await guardarDatos();
-
-alert("Configuración guardada.");
-
-}
-
-
-/* =========================
-   GUARDAR LOCAL + NUBE
-========================= */
-
-async function guardarDatos(){
+data.reservas=await r.json();
 
 localStorage.setItem(
-"padelBeariz",
-JSON.stringify(data)
+'padelReservas',
+JSON.stringify(data.reservas)
 );
+
+cloudStatus.textContent='🟢 Conectado a Supabase';
+cloudStatus.className='status ok';
+
+}catch(e){
+
+data.reservas=JSON.parse(
+localStorage.getItem('padelReservas')||'[]'
+);
+
+cloudStatus.textContent='🟡 Supabase no responde; usando datos de este móvil'
+}
+
+render()
+}
+
+async function createReservation(){
+
+let d=date.value;
+let t=time.value;
+let n=player.value.trim();
+
+if(!d||!t||!n)
+return alert('Completa fecha, hora y nombre');
+
+if(data.reservas.some(r=>
+String(r.fecha)===d &&
+String(r.hora)===t &&
+String(r.estado||'')!=='Cancelada'
+))
+return alert('Ese horario ya está ocupado');
+
+let r={
+fecha:d,
+hora:t,
+nombre:n,
+telefono:phone.value.trim(),
+carnet:carnet.value.trim(),
+pago:pay.value,
+estado:'Pendiente'
+};
 
 try{
 
-const respuesta=
-await fetch(API,{
+let resp=await fetch(
+API,
+{
+method:'POST',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'return=representation'
+},
+body:JSON.stringify(r)
+}
+);
 
-method:"POST",
+if(!resp.ok)throw Error(await resp.text());
 
-headers
+alert('Reserva registrada');
+
+player.value='';
+phone.value='';
+carnet.value='';
+
+await cargarNube();
+show('reservas');
+
+}catch(e){
+
+alert('No se pudo guardar la reserva.\n\n'+e.message)
+}
+}
+
+async function cancelar(id){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+if(!confirm('¿Cancelar esta reserva?'))
+return;
+
+try{
+
+let r=await fetch(
+API+'?id=eq.'+encodeURIComponent(id),
+{
+method:'PATCH',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json'
+},
+body:JSON.stringify({
+estado:'Cancelada'
+})
+}
+);
+
+if(!r.ok)throw Error(await r.text());
+
+await cargarNube();
+
+}catch(e){
+
+alert('No se pudo cancelar.\n'+e.message)
+}
+}
+
+function renderPlayers(){
+
+let map={};
+
+data.reservas.forEach(r=>{
+if(r.carnet||r.nombre)
+map[r.carnet||r.nombre]={
+nombre:r.nombre,
+telefono:r.telefono,
+carnet:r.carnet
+}
+});
+
+players.innerHTML=
+Object.values(map).map(p=>
+`<div class="card">
+<b>${esc(p.nombre)}</b>
+<div class="small">
+Carnet: ${esc(p.carnet||'Sin carnet')} · ${esc(p.telefono||'')}
+</div>
+</div>`
+).join('')||
+'<div class="card">No hay jugadores.</div>'
+}
+
+function renderIncome(){
+
+if(!isAdmin())return;
+
+let m=monthPick.value;
+
+let rs=data.reservas.filter(r=>
+String(r.fecha||'').startsWith(m) &&
+r.pago &&
+r.pago!=='Pendiente' &&
+String(r.estado||'')!=='Cancelada'
+);
+
+let total=rs.length*Number(data.price);
+
+document.getElementById('total').textContent=
+'€'+total.toFixed(2);
+
+document.getElementById('count').textContent=
+rs.length+' reservas cobradas';
+
+incomeRows.innerHTML=
+rs.map(r=>
+`<tr>
+<td>${esc(r.fecha)}</td>
+<td>${esc(r.hora)}</td>
+<td>${esc(r.nombre)}</td>
+<td>${esc(r.pago)}</td>
+<td>€${Number(data.price).toFixed(2)}</td>
+</tr>`
+).join('')
+}
+
+function saveConfig(){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+data.price=Number(price.value)||12;
+data.duration=Number(duration.value)||90;
+data.start=start.value||'09:00';
+data.end=end.value||'00:00';
+
+localStorage.setItem(
+'padelConfig',
+JSON.stringify(data)
+);
+
+render();
+
+alert('Configuración guardada en este móvil')
+}
+
+function render(){
+
+price.value=data.price;
+duration.value=data.duration;
+start.value=data.start;
+end.value=data.end;
+
+time.innerHTML=
+times().map(t=>
+`<option value="${t}">${t}</option>`
+).join('');
+
+renderSlots();
+renderPlayers();
+renderIncome();
+applyRole()
+}
+
+let cfg=JSON.parse(
+localStorage.getItem('padelConfig')||'null'
+);
+
+if(cfg){
+data.price=cfg.price||12;
+data.duration=cfg.duration||90;
+data.start=cfg.start||'09:00';
+data.end=cfg.end||'00:00'
+}
+
+render();
+cargarNube();
+
+setInterval(cargarNube,15000);
+</script>
+
+</body>
+</html>
