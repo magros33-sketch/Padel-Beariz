@@ -146,7 +146,17 @@ function renderSlots(){
  $('priceText').textContent=Number(data.price).toFixed(2);
 }
 
-function reserveAt(d,t){$('date').value=d;show('nueva');$('time').value=t}
+/* ÚNICO CAMBIO: conserva la hora que se ha pulsado */
+function reserveAt(d,t){
+  $('date').value=d;
+  $$('.page').forEach(x=>x.classList.add('hidden'));
+  $('nueva').classList.remove('hidden');
+
+  const selector=$('time');
+  const horas=times();
+  selector.innerHTML=horas.map(h=>`<option value="${h}">${h}</option>`).join('');
+  selector.value=t;
+}
 
 async function cargarNube(){
  try{
