@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pádel Beariz</title>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17221b}
@@ -20,7 +19,6 @@ button.active{background:#f2a900}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
 .slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}
 .slot.busy{background:#ffe5e5;border-color:#f4b3b3}
-.slot.request{background:#fff0b8;border-color:#e0a800}
 .small{font-size:13px;color:#68746d}
 .hidden{display:none}
 .status{padding:10px;border-radius:10px;background:#fff3cd}
@@ -31,7 +29,6 @@ label{font-weight:700}
 .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 table{width:100%;border-collapse:collapse}
 th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
-
 @media(max-width:600px){
 .wrap{padding:10px}
 .tabs button{flex:1 1 45%}
@@ -59,6 +56,7 @@ table{font-size:13px}
 <button class="adminOnly" onclick="show('ingresos',this)">💰 Ingresos</button>
 <button class="adminOnly" onclick="show('config',this)">⚙️ Configuración</button>
 <button onclick="adminLogin()">🔐 Admin</button>
+<button onclick="show('reservas')">🏠 Inicio</button>
 <button class="adminOnly" onclick="logoutAdmin()">Salir</button>
 </div>
 
@@ -70,21 +68,16 @@ table{font-size:13px}
 Fecha
 <input id="viewDate" type="date" onchange="renderSlots()">
 </label>
-
 <button onclick="setToday()">Hoy</button>
 </div>
 </div>
 
 <div class="card">
 <h2>Horarios</h2>
-
 <div class="small">
-Cada reserva dura
-<span id="durText">90</span>
-minutos · Precio €
-<span id="priceText">12</span>
+Cada reserva dura <span id="durText">90</span> minutos ·
+Precio €<span id="priceText">12</span>
 </div>
-
 <div id="slots" class="grid"></div>
 </div>
 
@@ -98,7 +91,6 @@ minutos · Precio €
 <section id="nueva" class="page hidden">
 
 <div class="card">
-
 <h2>➕ Nueva reserva</h2>
 
 <label>
@@ -131,9 +123,9 @@ Pago
 </label>
 
 <button onclick="createReservation()">Reservar</button>
+<button onclick="show('reservas')">🏠 Inicio</button>
 
 </div>
-
 </section>
 
 <section id="ingresos" class="page hidden adminOnly">
@@ -146,19 +138,13 @@ Mes
 </label>
 
 <div class="money" id="total">€0.00</div>
-
-<div class="small" id="count">
-0 reservas cobradas
-</div>
+<div class="small" id="count">0 reservas cobradas</div>
 
 </div>
 
 <div class="card">
-
 <div style="overflow:auto">
-
 <table>
-
 <thead>
 <tr>
 <th>Fecha</th>
@@ -168,13 +154,9 @@ Mes
 <th>Importe</th>
 </tr>
 </thead>
-
 <tbody id="incomeRows"></tbody>
-
 </table>
-
 </div>
-
 </div>
 
 </section>
@@ -182,7 +164,6 @@ Mes
 <section id="config" class="page hidden adminOnly">
 
 <div class="card">
-
 <h2>⚙️ Configuración</h2>
 
 <label>
@@ -208,7 +189,6 @@ Fin
 <button onclick="saveConfig()">Guardar configuración</button>
 
 </div>
-
 </section>
 
 </main>
@@ -216,9 +196,7 @@ Fin
 <script>
 
 const SUPABASE_URL='https://jppsqrbpjwulzapyvpim.supabase.co';
-
 const SUPABASE_KEY='sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
-
 const API=SUPABASE_URL+'/rest/v1/reservas';
 
 let data={
@@ -270,7 +248,6 @@ let saved=localStorage.getItem('padelPin')||'1234';
 if(p===saved){
 
 sessionStorage.setItem('padelAdmin','1');
-
 applyRole();
 
 alert('Administrador activado');
@@ -286,9 +263,7 @@ alert('PIN incorrecto');
 function logoutAdmin(){
 
 sessionStorage.removeItem('padelAdmin');
-
 applyRole();
-
 show('reservas');
 
 }
@@ -296,7 +271,7 @@ show('reservas');
 function applyRole(){
 
 $$('.adminOnly').forEach(e=>{
-e.style.display=isAdmin()?'':'none'
+e.style.display=isAdmin()?'':'none';
 });
 
 }
@@ -314,7 +289,6 @@ $(id).classList.remove('hidden');
 if(b){
 
 $$('.tabs button').forEach(x=>x.classList.remove('active'));
-
 b.classList.add('active');
 
 }
@@ -326,7 +300,6 @@ render();
 function setToday(){
 
 $('viewDate').value=new Date().toISOString().slice(0,10);
-
 renderSlots();
 
 }
@@ -340,12 +313,21 @@ let dur=Number(data.duration)||90;
 let [h,m]=inicio.split(':').map(Number);
 let [eh,em]=fin.split(':').map(Number);
 
+if(!Number.isFinite(h)||!Number.isFinite(m)){
+h=9;
+m=0;
+}
+
+if(!Number.isFinite(eh)||!Number.isFinite(em)){
+eh=0;
+em=0;
+}
+
 let limite=eh*60+em;
 
 if(limite===0)limite=1440;
 
 let cur=h*60+m;
-
 let out=[];
 
 while(cur+dur<=limite){
@@ -368,7 +350,7 @@ function horaFin(t){
 
 let [h,m]=t.split(':').map(Number);
 
-let x=h*60+m+90;
+let x=h*60+m+Number(data.duration||90);
 
 return String(Math.floor(x/60)%24).padStart(2,'0')+
 ':'+
@@ -394,120 +376,61 @@ m=>({
 function renderSlots(){
 
 let d=$('viewDate').value;
-
 let horas=times();
 
 $('slots').innerHTML=horas.map(t=>{
 
 let r=data.reservas.find(x=>
-String(x.fecha||'')===d &&
-String(x.hora_inicio||'').slice(0,5)===t &&
+String(x.fecha||'')===d&&
+String(x.hora_inicio||'').slice(0,5)===t&&
 String(x.estado||'')!=='Cancelada'
 );
 
-if(r){
+return r
 
-let solicitud=
-String(r.estado||'')==='Solicitud de cancelación';
-
-return `
-<div class="slot ${solicitud?'request':'busy'}">
-
+? `<div class="slot busy">
 <b>${t}</b><br>
-
-${solicitud
-?'🟠 SOLICITUD DE CANCELACIÓN'
-:'🔴 Ocupado'}
-
-<br>
-
-<span class="small">
-${esc(r.nombre||'')}
-</span>
-
-${solicitud
-?`<br><span class="small">📞 ${esc(r.telefono||'')}</span>
-<br><span class="small"><b>El jugador ha solicitado cancelar esta reserva.</b></span>`
-:''}
-
-<br>
-
+🔴 Ocupado<br>
+<span class="small">${esc(r.nombre||'')}</span><br>
 <button onclick="solicitarCancelacion('${esc(r.id)}','${esc(r.telefono||'')}')">
 Solicitar cancelación
 </button>
-
 ${isAdmin()
-?`<br>
-<button class="danger" onclick="cancelar('${esc(r.id)}')">
-Cancelar
-</button>`
+?`<br><button class="danger" onclick="cancelar('${esc(r.id)}')">Cancelar</button>`
 :''}
+</div>`
 
-</div>
-`;
-
-}
-
-return `
-<div class="slot">
-
+: `<div class="slot">
 <b>${t}</b><br>
-
-🟢 Disponible
-
-<br>
-
-<button onclick="reserveAt('${d}','${t}')">
-Reservar
-</button>
-
-</div>
-`;
+🟢 Disponible<br>
+<button onclick="reserveAt('${d}','${t}')">Reservar</button>
+</div>`;
 
 }).join('');
 
 let rs=data.reservas.filter(x=>
-String(x.fecha||'')===d &&
+String(x.fecha||'')===d&&
 String(x.estado||'')!=='Cancelada'
 );
 
 $('reservationList').innerHTML=rs.length
-?
-rs.map(r=>{
 
-let solicitud=
-String(r.estado||'')==='Solicitud de cancelación';
+?rs.map(r=>`
 
-return `
-<div class="card"
-style="
-margin:8px 0;
-padding:12px;
-${solicitud?'background:#fff0b8;border:2px solid #e0a800;':''}
-">
+<div class="card" style="margin:8px 0;padding:12px">
 
 <b>
-🕐 ${esc(String(r.hora_inicio||'').slice(0,5))}
-–
+🕐 ${esc(String(r.hora_inicio||'').slice(0,5))}–
 ${esc(String(r.hora_fin||'').slice(0,5))}
 </b>
 
-· ${esc(r.nombre||'')}
-
-<br>
+· ${esc(r.nombre||'')}<br>
 
 <span class="small">
-📞 ${esc(r.telefono||'')}
-· 💳 ${esc(r.metodo_pago||'Pendiente')}
-· ${esc(r.estado||'')}
+📞 ${esc(r.telefono||'')} ·
+💳 ${esc(r.metodo_pago||'Pendiente')} ·
+${esc(r.estado||'')}
 </span>
-
-${solicitud
-?`<br>
-<span style="color:#a56a00;font-weight:bold">
-🟠 ESTA RESERVA TIENE UNA SOLICITUD DE CANCELACIÓN
-</span>`
-:''}
 
 <br>
 
@@ -516,21 +439,16 @@ Solicitar cancelación
 </button>
 
 ${isAdmin()
-?`<br>
-<button class="danger" onclick="cancelar('${esc(r.id)}')">
-Cancelar
-</button>`
+?`<br><button class="danger" onclick="cancelar('${esc(r.id)}')">Cancelar</button>`
 :''}
 
 </div>
-`;
 
-}).join('')
-:
-'No hay reservas para esta fecha.';
+`).join('')
+
+:'No hay reservas para esta fecha.';
 
 $('durText').textContent=data.duration;
-
 $('priceText').textContent=Number(data.price).toFixed(2);
 
 }
@@ -569,7 +487,6 @@ JSON.stringify(data.reservas)
 );
 
 $('cloudStatus').textContent='🟢 Conectado a Supabase';
-
 $('cloudStatus').className='status ok';
 
 }catch(e){
@@ -600,14 +517,15 @@ return alert('Completa fecha, hora y nombre');
 
 if(
 data.reservas.some(r=>
-String(r.fecha)===d &&
-String(r.hora_inicio||'').slice(0,5)===t &&
+String(r.fecha)===d&&
+String(r.hora_inicio||'').slice(0,5)===t&&
 String(r.estado||'')!=='Cancelada'
 )
 )
 return alert('Ese horario ya está ocupado');
 
 let r={
+
 fecha:d,
 hora_inicio:t,
 hora_fin:horaFin(t),
@@ -615,6 +533,7 @@ nombre:n,
 telefono:$('phone').value.trim(),
 metodo_pago:$('pay').value,
 estado:'Pendiente'
+
 };
 
 try{
@@ -670,9 +589,7 @@ const normalizar=s=>
 String(s||'').replace(/\D/g,'');
 
 if(normalizar(p)!==normalizar(telefono))
-return alert(
-'El teléfono no coincide con la reserva.'
-);
+return alert('El teléfono no coincide con la reserva.');
 
 if(!confirm(
 '¿Solicitar la cancelación de esta reserva?'
@@ -699,9 +616,7 @@ estado:'Solicitud de cancelación'
 if(!r.ok)
 throw Error(await r.text());
 
-alert(
-'Solicitud enviada al administrador.'
-);
+alert('Solicitud enviada al administrador.');
 
 await cargarNube();
 
@@ -764,9 +679,9 @@ if(!isAdmin())return;
 let m=$('monthPick').value;
 
 let rs=data.reservas.filter(r=>
-String(r.fecha||'').startsWith(m) &&
-r.metodo_pago &&
-r.metodo_pago!=='Pendiente' &&
+String(r.fecha||'').startsWith(m)&&
+r.metodo_pago&&
+r.metodo_pago!=='Pendiente'&&
 String(r.estado||'')!=='Cancelada'
 );
 
@@ -780,6 +695,7 @@ rs.length+' reservas cobradas';
 
 $('incomeRows').innerHTML=
 rs.map(r=>`
+
 <tr>
 <td>${esc(r.fecha)}</td>
 <td>${esc(String(r.hora_inicio||'').slice(0,5))}</td>
@@ -787,45 +703,20 @@ rs.map(r=>`
 <td>${esc(r.metodo_pago)}</td>
 <td>€${Number(data.price).toFixed(2)}</td>
 </tr>
+
 `).join('');
 
 }
 
-/* ÚNICO CAMBIO: GUARDADO DE CONFIGURACIÓN */
 function saveConfig(){
 
 if(!isAdmin())
 return alert('Solo el administrador');
 
-const nuevoPrecio=parseFloat(
-$('price').value
-);
-
-const nuevaDuracion=parseInt(
-$('duration').value,
-10
-);
-
-const nuevoInicio=$('start').value;
-
-const nuevoFin=$('end').value;
-
-if(!Number.isFinite(nuevoPrecio)||nuevoPrecio<=0)
-return alert('Introduce un precio válido.');
-
-if(!Number.isFinite(nuevaDuracion)||nuevaDuracion<30)
-return alert('La duración debe ser de al menos 30 minutos.');
-
-if(!nuevoInicio)
-return alert('Introduce la hora de inicio.');
-
-if(!nuevoFin)
-return alert('Introduce la hora de fin.');
-
-data.price=nuevoPrecio;
-data.duration=nuevaDuracion;
-data.start=nuevoInicio;
-data.end=nuevoFin;
+data.price=Number($('price').value)||12;
+data.duration=Number($('duration').value)||90;
+data.start=$('start').value||'09:00';
+data.end=$('end').value||'00:00';
 
 localStorage.setItem(
 'padelConfig',
@@ -839,7 +730,7 @@ end:data.end
 
 render();
 
-alert('✅ Configuración guardada correctamente.');
+alert('Configuración guardada correctamente');
 
 }
 
@@ -855,15 +746,11 @@ if(!Number(data.duration)||Number(data.duration)<30)
 data.duration=90;
 
 $('price').value=data.price;
-
 $('duration').value=data.duration;
-
 $('start').value=data.start;
-
 $('end').value=data.end;
 
 const selector=$('time');
-
 const horas=times();
 
 selector.innerHTML=
@@ -872,9 +759,7 @@ horas.map(t=>
 ).join('');
 
 renderSlots();
-
 renderIncome();
-
 applyRole();
 
 }
