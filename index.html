@@ -18,7 +18,8 @@
 <button class="adminOnly" onclick="show('ingresos',this)">💰 Ingresos</button>
 <button class="adminOnly" onclick="show('config',this)">⚙️ Configuración</button>
 <button onclick="adminLogin()">🔐 Admin</button>
-<button onclick="show('reservas')">🏠 Inicio</button><button class="adminOnly" onclick="logoutAdmin()">Salir</button>
+<button onclick="show('reservas')">🏠 Inicio</button>
+<button class="adminOnly" onclick="logoutAdmin()">Salir</button>
 </div>
 
 <section id="reservas" class="page">
@@ -146,19 +147,15 @@ function renderSlots(){
  $('priceText').textContent=Number(data.price).toFixed(2);
 }
 
-/* ÚNICO CAMBIO: conserva la hora que se ha pulsado */
 function reserveAt(d,t){
   $('date').value=d;
   $$('.page').forEach(x=>x.classList.add('hidden'));
   $('nueva').classList.remove('hidden');
-
   const selector=$('time');
   const horas=times();
   selector.innerHTML=horas.map(h=>`<option value="${h}">${h}</option>`).join('');
   selector.value=t;
-}
-
-async function cargarNube(){
+}async function cargarNube(){
  try{
   let r=await fetch(API+'?select=*&order=fecha.asc,hora_inicio.asc',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});
   if(!r.ok)throw Error(await r.text());
