@@ -4,104 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pádel Beariz</title>
-
 <style>
 *{box-sizing:border-box}
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#f4f7f5;
-color:#17221b
-}
-header{
-background:#123b2a;
-color:#fff;
-padding:18px
-}
-.wrap{
-max-width:980px;
-margin:auto;
-padding:16px
-}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17221b}
+header{background:#123b2a;color:#fff;padding:18px}
+.wrap{max-width:980px;margin:auto;padding:16px}
 h1{margin:0 0 4px}
 .sub{opacity:.85}
-.tabs{
-display:flex;
-gap:7px;
-flex-wrap:wrap;
-margin-bottom:12px
-}
-button{
-border:0;
-border-radius:10px;
-padding:11px 14px;
-background:#1e7a55;
-color:#fff;
-font-weight:700
-}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+button{border:0;border-radius:10px;padding:11px 14px;background:#1e7a55;color:#fff;font-weight:700}
 button.active{background:#f2a900}
 .danger{background:#b3261e}
-.card{
-background:#fff;
-border-radius:16px;
-padding:16px;
-margin:12px 0;
-box-shadow:0 2px 10px #0001
-}
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
-gap:10px
-}
-.slot{
-padding:14px;
-border-radius:12px;
-background:#e7f4ed;
-border:1px solid #b9ddca
-}
-.slot.busy{
-background:#ffe5e5;
-border-color:#f4b3b3
-}
-.small{
-font-size:13px;
-color:#68746d
-}
+.card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}
+.slot.busy{background:#ffe5e5;border-color:#f4b3b3}
+.small{font-size:13px;color:#68746d}
 .hidden{display:none}
-.status{
-padding:10px;
-border-radius:10px;
-background:#fff3cd
-}
+.status{padding:10px;border-radius:10px;background:#fff3cd}
 .ok{background:#dff4e7}
-.money{
-font-size:30px;
-font-weight:800
-}
-input,select{
-width:100%;
-padding:11px;
-border:1px solid #ccd5cf;
-border-radius:9px;
-margin:5px 0 10px
-}
+.money{font-size:30px;font-weight:800}
+input,select{width:100%;padding:11px;border:1px solid #ccd5cf;border-radius:9px;margin:5px 0 10px}
 label{font-weight:700}
-.row{
-display:flex;
-gap:10px;
-align-items:center;
-justify-content:space-between;
-flex-wrap:wrap
-}
-table{
-width:100%;
-border-collapse:collapse
-}
-th,td{
-padding:9px;
-border-bottom:1px solid #eee;
-text-align:left
-}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}
+th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
 @media(max-width:600px){
 .wrap{padding:10px}
 .tabs button{flex:1 1 45%}
@@ -121,117 +48,67 @@ table{font-size:13px}
 
 <main class="wrap">
 
-<div id="cloudStatus" class="status">
-🟡 Conectando…
-</div>
+<div id="cloudStatus" class="status">🟡 Conectando…</div>
 
 <div class="tabs">
-
-<button class="active"
-onclick="show('reservas',this)">
-📅 Reservas
-</button>
-
-<button onclick="show('nueva',this)">
-➕ Nueva
-</button>
-
-<button class="adminOnly"
-onclick="show('ingresos',this)">
-💰 Ingresos
-</button>
-
-<button class="adminOnly"
-onclick="show('config',this)">
-⚙️ Configuración
-</button>
-
-<button onclick="adminLogin()">
-🔐 Admin
-</button>
-
-<button class="adminOnly"
-onclick="logoutAdmin()">
-Salir
-</button>
-
+<button class="active" onclick="show('reservas',this)">📅 Reservas</button>
+<button onclick="show('nueva',this)">➕ Nueva</button>
+<button class="adminOnly" onclick="show('ingresos',this)">💰 Ingresos</button>
+<button class="adminOnly" onclick="show('config',this)">⚙️ Configuración</button>
+<button onclick="adminLogin()">🔐 Admin</button>
+<button class="adminOnly" onclick="logoutAdmin()">Salir</button>
 </div>
-
 
 <section id="reservas" class="page">
 
 <div class="card">
-
 <div class="row">
-
 <label>
 Fecha
-<input
-id="viewDate"
-type="date"
-onchange="renderSlots()">
+<input id="viewDate" type="date" onchange="renderSlots()">
 </label>
-
-<button onclick="setToday()">
-Hoy
-</button>
-
+<button onclick="setToday()">Hoy</button>
 </div>
-
 </div>
-
 
 <div class="card">
-
 <h2>Horarios</h2>
-
 <div class="small">
-Cada reserva dura
-<span id="durText">90</span>
-minutos · Precio €
-<span id="priceText">12</span>
+Cada reserva dura <span id="durText">90</span> minutos ·
+Precio €<span id="priceText">12</span>
+</div>
+<div id="slots" class="grid"></div>
 </div>
 
-<div id="slots" class="grid"></div>
-
+<div class="card">
+<h2>📋 Reservas registradas</h2>
+<div id="reservationList">No hay reservas para esta fecha.</div>
 </div>
 
 </section>
 
-
 <section id="nueva" class="page hidden">
 
 <div class="card">
-
 <h2>➕ Nueva reserva</h2>
 
-<label>
-Fecha
+<label>Fecha
 <input id="date" type="date">
 </label>
 
-<label>
-Hora
+<label>Hora
 <select id="time"></select>
 </label>
 
-<label>
-Nombre
-<input
-id="player"
-placeholder="Nombre del jugador">
+<label>Nombre
+<input id="player" placeholder="Nombre del jugador">
 </label>
 
-<label>
-Teléfono
-<input
-id="phone"
-inputmode="tel"
-placeholder="Teléfono">
+<label>Teléfono
+<input id="phone" inputmode="tel" placeholder="Teléfono">
 </label>
 
-<label>
-Pago
+<label>Pago
 <select id="pay">
 <option>Pendiente</option>
 <option>Efectivo</option>
@@ -239,43 +116,26 @@ Pago
 </select>
 </label>
 
-<button onclick="createReservation()">
-Reservar
-</button>
+<button onclick="createReservation()">Reservar</button>
 
 </div>
-
 </section>
-
 
 <section id="ingresos" class="page hidden adminOnly">
 
 <div class="card">
-
 <label>
 Mes
-<input
-id="monthPick"
-type="month"
-onchange="renderIncome">
+<input id="monthPick" type="month" onchange="renderIncome()">
 </label>
 
-<div class="money" id="total">
-€0.00
-</div>
-
-<div class="small" id="count">
-0 reservas cobradas
-</div>
-
+<div class="money" id="total">€0.00</div>
+<div class="small" id="count">0 reservas cobradas</div>
 </div>
 
 <div class="card">
-
 <div style="overflow:auto">
-
 <table>
-
 <thead>
 <tr>
 <th>Fecha</th>
@@ -285,76 +145,46 @@ onchange="renderIncome">
 <th>Importe</th>
 </tr>
 </thead>
-
 <tbody id="incomeRows"></tbody>
-
 </table>
-
 </div>
-
 </div>
 
 </section>
-
 
 <section id="config" class="page hidden adminOnly">
 
 <div class="card">
-
 <h2>⚙️ Configuración</h2>
 
-<label>
-Precio (€)
-<input
-id="price"
-type="number"
-step="0.50">
+<label>Precio (€)
+<input id="price" type="number" step="0.50">
 </label>
 
-<label>
-Duración (minutos)
-<input
-id="duration"
-type="number"
-step="30">
+<label>Duración (minutos)
+<input id="duration" type="number" step="30">
 </label>
 
-<label>
-Inicio
-<input
-id="start"
-type="time">
+<label>Inicio
+<input id="start" type="time">
 </label>
 
-<label>
-Fin
-<input
-id="end"
-type="time">
+<label>Fin
+<input id="end" type="time">
 </label>
 
-<button onclick="saveConfig()">
-Guardar configuración
-</button>
+<button onclick="saveConfig()">Guardar configuración</button>
 
 </div>
-
 </section>
 
 </main>
 
-
 <script>
 
-const SUPABASE_URL =
-'https://jppsqrbpjwulzapyvpim.supabase.co';
-
-const SUPABASE_KEY =
-'sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
-
-const API =
-SUPABASE_URL+'/rest/v1/reservas';
-
+const SUPABASE_URL='https://jppsqrbpjwulzapyvpim.supabase.co';
+const SUPABASE_KEY='sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
+const API=SUPABASE_URL+'/rest/v1/reservas';
 
 let data={
 reservas:[],
@@ -364,19 +194,34 @@ start:'09:00',
 end:'00:00'
 };
 
+const $=id=>document.getElementById(id);
 
-const today =
-new Date().toISOString().slice(0,10);
+function init(){
 
-viewDate.value=today;
-date.value=today;
-monthPick.value=today.slice(0,7);
+const today=new Date().toISOString().slice(0,10);
 
+$('viewDate').value=today;
+$('date').value=today;
+$('monthPick').value=today.slice(0,7);
 
-function isAdmin(){
-return sessionStorage.getItem('padelAdmin')==='1';
+let cfg=JSON.parse(localStorage.getItem('padelConfig')||'null');
+
+if(cfg){
+data.price=Number(cfg.price)||12;
+data.duration=Number(cfg.duration)||90;
+data.start=cfg.start||'09:00';
+data.end=cfg.end||'00:00';
 }
 
+render();
+cargarNube();
+
+setInterval(cargarNube,15000);
+}
+
+function isAdmin(){
+return sessionStorage.getItem('padelAdmin')==='1'
+}
 
 function adminLogin(){
 
@@ -384,18 +229,12 @@ let p=prompt('PIN de administrador:');
 
 if(p===null)return;
 
-let saved=
-localStorage.getItem('padelPin')||'1234';
+let saved=localStorage.getItem('padelPin')||'1234';
 
 if(p===saved){
 
-sessionStorage.setItem(
-'padelAdmin',
-'1'
-);
-
+sessionStorage.setItem('padelAdmin','1');
 applyRole();
-
 alert('Administrador activado');
 
 }else{
@@ -403,54 +242,37 @@ alert('Administrador activado');
 alert('PIN incorrecto');
 
 }
-
 }
-
 
 function logoutAdmin(){
 
-sessionStorage.removeItem(
-'padelAdmin'
-);
-
+sessionStorage.removeItem('padelAdmin');
 applyRole();
-
 show('reservas');
 
 }
 
-
 function applyRole(){
 
-document
-.querySelectorAll('.adminOnly')
-.forEach(e=>{
-e.style.display=
-isAdmin()?'':'none';
+$$('.adminOnly').forEach(e=>{
+e.style.display=isAdmin()?'':'none'
 });
 
 }
 
+function $$(sel){
+return document.querySelectorAll(sel)
+}
 
 function show(id,b){
 
-document
-.querySelectorAll('.page')
-.forEach(x=>
-x.classList.add('hidden')
-);
+$$('.page').forEach(x=>x.classList.add('hidden'));
 
-document
-.getElementById(id)
-.classList.remove('hidden');
+$(id).classList.remove('hidden');
 
 if(b){
 
-document
-.querySelectorAll('.tabs button')
-.forEach(x=>
-x.classList.remove('active')
-);
+$$('.tabs button').forEach(x=>x.classList.remove('active'));
 
 b.classList.add('active');
 
@@ -460,54 +282,49 @@ render();
 
 }
 
-
 function setToday(){
 
-viewDate.value=today;
+$('viewDate').value=new Date().toISOString().slice(0,10);
 
 renderSlots();
 
 }
 
-
-function normalizarHora(v){
-
-return String(v||'')
-.slice(0,5);
-
-}
-
-
 function times(){
 
-let out=[];
+let inicio=data.start||'09:00';
+let fin=data.end||'00:00';
+let dur=Number(data.duration)||90;
 
-let [h,m]=
-data.start.split(':').map(Number);
+let [h,m]=inicio.split(':').map(Number);
+let [eh,em]=fin.split(':').map(Number);
 
-let [eh,em]=
-data.end.split(':').map(Number);
+if(!Number.isFinite(h)||!Number.isFinite(m)){
+h=9;
+m=0;
+}
 
-let end=eh*60+em;
+if(!Number.isFinite(eh)||!Number.isFinite(em)){
+eh=0;
+em=0;
+}
 
-if(end===0)end=1440;
+let limite=eh*60+em;
+
+if(limite===0)limite=1440;
 
 let cur=h*60+m;
+let out=[];
 
-while(
-cur+Number(data.duration)<=end
-){
+while(cur+dur<=limite){
 
 out.push(
-String(Math.floor(cur/60))
-.padStart(2,'0')
-+
+String(Math.floor(cur/60)%24).padStart(2,'0')+
 ':'+
-String(cur%60)
-.padStart(2,'0')
+String(cur%60).padStart(2,'0')
 );
 
-cur+=Number(data.duration);
+cur+=dur;
 
 }
 
@@ -515,184 +332,160 @@ return out;
 
 }
 
-
 function horaFin(t){
 
-let [h,m]=
-t.split(':').map(Number);
+let [h,m]=t.split(':').map(Number);
 
-let x=
-h*60+m+Number(data.duration);
+let x=h*60+m+Number(data.duration);
 
-return String(Math.floor(x/60)%24)
-.padStart(2,'0')
-+
+return String(Math.floor(x/60)%24).padStart(2,'0')+
 ':'+
-String(x%60)
-.padStart(2,'0');
+String(x%60).padStart(2,'0');
 
 }
 
-
 function esc(v){
 
-return String(v??'')
-.replace(/[&<>"']/g,m=>({
+return String(v??'').replace(
+/[&<>"']/g,
+m=>({
 '&':'&amp;',
 '<':'&lt;',
 '>':'&gt;',
 '"':'&quot;',
 "'":'&#39;'
-}[m]));
+}[m])
+);
 
 }
 
+function normalizarHora(v){
+
+return String(v??'').slice(0,5);
+
+}
 
 function renderSlots(){
 
-let d=viewDate.value;
+let d=$('viewDate').value;
 
-slots.innerHTML=
-times().map(t=>{
+let horas=times();
+
+$('slots').innerHTML=horas.map(t=>{
 
 let r=data.reservas.find(x=>
-String(x.fecha||'').slice(0,10)===d &&
+String(x.fecha||'')===d &&
 normalizarHora(x.hora_inicio)===t &&
 String(x.estado||'')!=='Cancelada'
 );
 
-if(r){
+return r
 
-return `
-<div class="slot busy">
-
-<b>${t}</b>
-
-<br>
-
-🔴 Ocupado
-
-<br>
-
-<span class="small">
-${esc(r.nombre||'')}
-</span>
-
-${isAdmin()?
-
-`<br>
-<button
-class="danger"
-onclick="cancelar(${Number(r.id)})">
-Cancelar
-</button>`
-
-:''}
-
-</div>
-`;
-
+? `<div class="slot busy">
+<b>${t}</b><br>
+🔴 Ocupado<br>
+<span class="small">${esc(r.nombre||'')}</span>
+${isAdmin()
+?`<br><button class="danger" onclick="cancelar('${esc(r.fecha)}','${esc(String(r.hora_inicio||'').slice(0,8))}')">Cancelar</button>`
+:''
 }
+</div>`
 
-return `
-<div class="slot">
-
-<b>${t}</b>
-
-<br>
-
-🟢 Disponible
-
-<br>
-
-<button
-onclick="reserveAt('${d}','${t}')">
-Reservar
-</button>
-
-</div>
-`;
+: `<div class="slot">
+<b>${t}</b><br>
+🟢 Disponible<br>
+<button onclick="reserveAt('${d}','${t}')">Reservar</button>
+</div>`;
 
 }).join('');
 
-durText.textContent=data.duration;
+let rs=data.reservas.filter(x=>
+String(x.fecha||'')===d &&
+String(x.estado||'')!=='Cancelada'
+);
 
-priceText.textContent=
-Number(data.price).toFixed(2);
+$('reservationList').innerHTML=rs.length
 
+?rs.map(r=>`
+
+<div class="card" style="margin:8px 0;padding:12px">
+
+<b>🕐 ${esc(String(r.hora_inicio||'').slice(0,5))}–${esc(String(r.hora_fin||'').slice(0,5))}</b>
+· ${esc(r.nombre||'')}
+<br>
+
+<span class="small">
+📞 ${esc(r.telefono||'')}
+· 💳 ${esc(r.metodo_pago||'Pendiente')}
+· ${esc(r.estado||'')}
+</span>
+
+${isAdmin()
+?`<br><button class="danger" onclick="cancelar('${esc(r.fecha)}','${esc(String(r.hora_inicio||'').slice(0,8))}')">Cancelar</button>`
+:''
 }
 
+</div>
+
+`).join('')
+
+:'No hay reservas para esta fecha.';
+
+$('durText').textContent=data.duration;
+$('priceText').textContent=Number(data.price).toFixed(2);
+
+}
 
 function reserveAt(d,t){
 
-date.value=d;
-
-render();
-
-time.value=t;
+$('date').value=d;
 
 show('nueva');
 
-}
+$('time').value=t;
 
+}
 
 async function cargarNube(){
 
 try{
 
 let r=await fetch(
-API+
-'?select=*&order=fecha.asc,hora_inicio.asc',
+API+'?select=*&order=fecha.asc,hora_inicio.asc',
 {
 headers:{
 apikey:SUPABASE_KEY,
-Authorization:
-'Bearer '+SUPABASE_KEY
+Authorization:'Bearer '+SUPABASE_KEY
 }
 }
 );
 
-if(!r.ok)
-throw Error(await r.text());
+if(!r.ok)throw Error(await r.text());
 
-data.reservas=
-(await r.json()).map(x=>({
-
+data.reservas=(await r.json()).map(x=>({
 ...x,
-
-hora_inicio:
-normalizarHora(x.hora_inicio),
-
-hora_fin:
-normalizarHora(x.hora_fin)
-
+hora_inicio:normalizarHora(x.hora_inicio),
+hora_fin:normalizarHora(x.hora_fin)
 }));
-
 
 localStorage.setItem(
 'padelReservas',
 JSON.stringify(data.reservas)
 );
 
-
-cloudStatus.textContent=
-'🟢 Conectado a Supabase';
-
-cloudStatus.className=
-'status ok';
-
+$('cloudStatus').textContent='🟢 Conectado a Supabase';
+$('cloudStatus').className='status ok';
 
 }catch(e){
 
-data.reservas=
-JSON.parse(
-localStorage.getItem(
-'padelReservas'
-)||'[]'
+data.reservas=JSON.parse(
+localStorage.getItem('padelReservas')||'[]'
 );
 
-cloudStatus.textContent=
+$('cloudStatus').textContent=
 '🟡 Supabase no responde; usando datos de este móvil';
+
+$('cloudStatus').className='status';
 
 }
 
@@ -700,412 +493,210 @@ render();
 
 }
 
-
 async function createReservation(){
 
-let d=date.value;
+let d=$('date').value;
+let t=$('time').value;
+let n=$('player').value.trim();
 
-let t=time.value;
+if(!d||!t||!n)
+return alert('Completa fecha, hora y nombre');
 
-let n=
-player.value.trim();
-
-
-if(!d||!t||!n){
-
-return alert(
-'Completa fecha, hora y nombre'
-);
-
-}
-
-
-if(
-data.reservas.some(r=>
-String(r.fecha||'').slice(0,10)===d &&
+if(data.reservas.some(r=>
+String(r.fecha)===d &&
 normalizarHora(r.hora_inicio)===t &&
 String(r.estado||'')!=='Cancelada'
-)
-){
-
-return alert(
-'Ese horario ya está ocupado'
-);
-
-}
-
+))
+return alert('Ese horario ya está ocupado');
 
 let r={
-
-pista:'Pista 1',
-
+pista_id:1,
 fecha:d,
-
 hora_inicio:t,
-
-hora_fin:
-horaFin(t),
-
+hora_fin:horaFin(t),
 nombre:n,
-
-telefono:
-phone.value.trim(),
-
-metodo_pago:
-pay.value,
-
-precio:
-Number(data.price),
-
-estado:
-'Pendiente'
-
+telefono:$('phone').value.trim(),
+metodo_pago:$('pay').value,
+precio:Number(data.price),
+estado:'Pendiente'
 };
-
 
 try{
 
-let resp=await fetch(
-API,
-{
+let resp=await fetch(API,{
 method:'POST',
-
 headers:{
 apikey:SUPABASE_KEY,
-Authorization:
-'Bearer '+SUPABASE_KEY,
-'Content-Type':
-'application/json',
-Prefer:
-'return=representation'
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'return=representation'
 },
-
-body:
-JSON.stringify(r)
-
-}
-);
-
+body:JSON.stringify(r)
+});
 
 if(!resp.ok)
 throw Error(await resp.text());
 
+alert('Reserva registrada');
 
-alert(
-'Reserva registrada'
-);
-
-player.value='';
-phone.value='';
+$('player').value='';
+$('phone').value='';
 
 await cargarNube();
+
+$('date').value=d;
 
 show('reservas');
 
-
 }catch(e){
 
 alert(
-'No se pudo guardar la reserva.\n\n'
-+e.message
+'No se pudo guardar la reserva.\n\n'+e.message
 );
 
 }
 
 }
 
+/* CANCELAR CORREGIDO */
+async function cancelar(fecha,hora){
 
-/*
-=========================================
-CANCELAR
-USAMOS EL ID REAL DE SUPABASE
-=========================================
-*/
+if(!isAdmin())
+return alert('Solo el administrador');
 
-async function cancelar(id){
-
-if(!isAdmin()){
-
-alert(
-'Solo el administrador'
-);
-
+if(!confirm('¿Cancelar esta reserva?'))
 return;
-
-}
-
-
-const numeroId=Number(id);
-
-
-if(!Number.isInteger(numeroId)){
-
-alert(
-'ID de reserva no válido.'
-);
-
-return;
-
-}
-
-
-if(!confirm(
-'¿Cancelar esta reserva?'
-))return;
-
 
 try{
 
-const url=
+let r=await fetch(
 API+
-'?id=eq.'+
-numeroId;
-
-
-const r=
-await fetch(
-url,
+'?fecha=eq.'+
+encodeURIComponent(fecha)+
+'&hora_inicio=eq.'+
+encodeURIComponent(hora),
 {
 method:'PATCH',
-
 headers:{
 apikey:SUPABASE_KEY,
-Authorization:
-'Bearer '+SUPABASE_KEY,
-'Content-Type':
-'application/json',
-
-Prefer:
-'return=representation'
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'return=representation'
 },
-
-body:
-JSON.stringify({
+body:JSON.stringify({
 estado:'Cancelada'
 })
-
 }
 );
 
+if(!r.ok)
+throw Error(await r.text());
 
-if(!r.ok){
+let resultado=await r.json();
 
-throw Error(
-await r.text()
-);
-
-}
-
-
-const resultado=
-await r.json();
-
-
-if(
-!Array.isArray(resultado)||
-resultado.length===0
-){
-
-throw Error(
-'Supabase no actualizó ninguna reserva.'
-);
-
-}
-
+if(!Array.isArray(resultado)||resultado.length===0)
+throw Error('Supabase no encontró esa reserva.');
 
 await cargarNube();
 
-
-alert(
-'Reserva cancelada correctamente'
-);
-
+alert('Reserva cancelada correctamente');
 
 }catch(e){
 
 alert(
-'No se pudo cancelar.\n\n'
-+e.message
+'No se pudo cancelar.\n\n'+e.message
 );
 
 }
 
 }
-
 
 function renderIncome(){
 
 if(!isAdmin())return;
 
-let m=
-monthPick.value;
+let m=$('monthPick').value;
 
-
-let rs=
-data.reservas.filter(r=>
-String(r.fecha||'')
-.startsWith(m) &&
-
+let rs=data.reservas.filter(r=>
+String(r.fecha||'').startsWith(m) &&
 r.metodo_pago &&
-
 r.metodo_pago!=='Pendiente' &&
-
-String(r.estado||'')
-!=='Cancelada'
+String(r.estado||'')!=='Cancelada'
 );
 
+let total=rs.reduce(
+(a,r)=>a+Number(r.precio??data.price),
+0
+);
 
-let total=
-rs.length*
-Number(data.price);
+$('total').textContent='€'+total.toFixed(2);
 
+$('count').textContent=
+rs.length+' reservas cobradas';
 
-document.getElementById(
-'total'
-).textContent=
-'€'+total.toFixed(2);
-
-
-document.getElementById(
-'count'
-).textContent=
-rs.length+
-' reservas cobradas';
-
-
-incomeRows.innerHTML=
-rs.map(r=>`
+$('incomeRows').innerHTML=rs.map(r=>`
 
 <tr>
-
-<td>
-${esc(r.fecha)}
-</td>
-
-<td>
-${esc(normalizarHora(r.hora_inicio))}
-</td>
-
-<td>
-${esc(r.nombre)}
-</td>
-
-<td>
-${esc(r.metodo_pago)}
-</td>
-
-<td>
-€${Number(data.price).toFixed(2)}
-</td>
-
+<td>${esc(r.fecha)}</td>
+<td>${esc(String(r.hora_inicio||'').slice(0,5))}</td>
+<td>${esc(r.nombre)}</td>
+<td>${esc(r.metodo_pago)}</td>
+<td>€${Number(r.precio??data.price).toFixed(2)}</td>
 </tr>
 
 `).join('');
 
 }
 
-
 function saveConfig(){
 
-if(!isAdmin()){
+if(!isAdmin())
+return alert('Solo el administrador');
 
-return alert(
-'Solo el administrador'
-);
-
-}
-
-
-data.price=
-Number(price.value)||12;
-
-data.duration=
-Number(duration.value)||90;
-
-data.start=
-start.value||'09:00';
-
-data.end=
-end.value||'00:00';
-
+data.price=Number($('price').value)||12;
+data.duration=Number($('duration').value)||90;
+data.start=$('start').value||'09:00';
+data.end=$('end').value||'00:00';
 
 localStorage.setItem(
 'padelConfig',
 JSON.stringify(data)
 );
 
-
 render();
 
-
-alert(
-'Configuración guardada'
-);
+alert('Configuración guardada en este móvil');
 
 }
 
-
 function render(){
 
-price.value=data.price;
+if(!data.start)data.start='09:00';
+if(!data.end)data.end='00:00';
 
-duration.value=data.duration;
+if(!Number(data.duration)||Number(data.duration)<30)
+data.duration=90;
 
-start.value=data.start;
+$('price').value=data.price;
+$('duration').value=data.duration;
+$('start').value=data.start;
+$('end').value=data.end;
 
-end.value=data.end;
+const selector=$('time');
 
+const horas=times();
 
-time.innerHTML=
-times().map(t=>
-`<option value="${t}">
-${t}
-</option>`
+selector.innerHTML=horas.map(t=>
+`<option value="${t}">${t}</option>`
 ).join('');
 
-
 renderSlots();
-
 renderIncome();
-
 applyRole();
 
 }
 
-
-let cfg=
-JSON.parse(
-localStorage.getItem(
-'padelConfig'
-)||'null'
-);
-
-
-if(cfg){
-
-data.price=
-cfg.price||12;
-
-data.duration=
-cfg.duration||90;
-
-data.start=
-cfg.start||'09:00';
-
-data.end=
-cfg.end||'00:00';
-
-}
-
-
-render();
-
-cargarNube();
-
-setInterval(
-cargarNube,
-15000
-);
+init();
 
 </script>
 
