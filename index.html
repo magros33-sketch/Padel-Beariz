@@ -7,46 +7,180 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17221b}
-header{background:#123b2a;color:white;padding:18px}
-.wrap{max-width:980px;margin:auto;padding:16px}
+
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f4f7f5;
+ color:#17221b;
+}
+
+header{
+ background:#123b2a;
+ color:white;
+ padding:18px;
+}
+
+.wrap{
+ max-width:1100px;
+ margin:auto;
+ padding:14px;
+}
+
 h1{margin:0 0 4px}
 .sub{opacity:.85}
-.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
-button{border:0;border-radius:10px;padding:11px 14px;background:#1e7a55;color:white;font-weight:700}
+
+.tabs{
+ display:flex;
+ gap:7px;
+ flex-wrap:wrap;
+ margin-bottom:12px;
+}
+
+button{
+ border:0;
+ border-radius:10px;
+ padding:10px 13px;
+ background:#1e7a55;
+ color:white;
+ font-weight:700;
+ cursor:pointer;
+}
+
 button.active{background:#f2a900}
 button.danger{background:#b3261e}
-.card{background:white;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
-.slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}
-.slot.busy{background:#ffe5e5;border-color:#f4b3b3}
-.small{font-size:13px;color:#68746d}
+
+.card{
+ background:white;
+ border-radius:16px;
+ padding:15px;
+ margin:12px 0;
+ box-shadow:0 2px 10px #0001;
+}
+
+.status{
+ padding:10px;
+ border-radius:10px;
+ background:#fff3cd;
+}
+
+.status.ok{background:#dff4e7}
+
 .hidden{display:none}
-.status{padding:10px;border-radius:10px;background:#fff3cd}
-.ok{background:#dff4e7}
-.money{font-size:30px;font-weight:800}
+
 input,select{
  width:100%;
  padding:11px;
  border:1px solid #ccd5cf;
  border-radius:9px;
- margin:5px 0 10px
+ margin:5px 0 10px;
 }
+
 label{font-weight:700}
+
 .row{
  display:flex;
- gap:10px;
+ gap:8px;
  align-items:center;
  justify-content:space-between;
- flex-wrap:wrap
+ flex-wrap:wrap;
 }
-table{width:100%;border-collapse:collapse}
-th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
-@media(max-width:600px){
- .wrap{padding:10px}
- .tabs button{flex:1 1 45%}
- table{font-size:13px}
+
+.weeknav{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:8px;
+ margin-bottom:12px;
 }
+
+.weektitle{
+ text-align:center;
+ font-size:18px;
+ font-weight:800;
+ flex:1;
+}
+
+.week{
+ display:grid;
+ grid-template-columns:repeat(7,minmax(150px,1fr));
+ gap:8px;
+ overflow-x:auto;
+ padding-bottom:8px;
+}
+
+.day{
+ background:#f8faf9;
+ border:1px solid #dce5df;
+ border-radius:12px;
+ overflow:hidden;
+ min-width:150px;
+}
+
+.dayhead{
+ background:#123b2a;
+ color:white;
+ padding:10px;
+ text-align:center;
+ font-weight:800;
+}
+
+.dayhead.today{
+ background:#f2a900;
+ color:#17221b;
+}
+
+.slot{
+ margin:7px;
+ padding:9px;
+ border-radius:10px;
+ background:#e7f4ed;
+ border:1px solid #b9ddca;
+}
+
+.slot.busy{
+ background:#ffe5e5;
+ border-color:#f4b3b3;
+}
+
+.slot b{
+ font-size:16px;
+}
+
+.small{
+ font-size:12px;
+ color:#68746d;
+}
+
+.admininfo{
+ margin-top:5px;
+ padding-top:5px;
+ border-top:1px solid #e4caca;
+ font-size:12px;
+}
+
+.money{
+ font-size:30px;
+ font-weight:800;
+}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+}
+
+th,td{
+ padding:9px;
+ border-bottom:1px solid #eee;
+ text-align:left;
+}
+
+@media(max-width:800px){
+ .week{
+  grid-template-columns:repeat(7,145px);
+ }
+}
+
 </style>
 </head>
 
@@ -61,41 +195,83 @@ th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
 
 <main class="wrap">
 
-<div id="cloudStatus" class="status">🟡 Conectando…</div>
+<div id="cloudStatus" class="status">
+🟡 Conectando con Supabase…
+</div>
 
 <div class="tabs">
-<button class="active" onclick="show('reservas',this)">📅 Reservas</button>
-<button onclick="show('nueva',this)">➕ Nueva</button>
-<button class="adminOnly" onclick="show('ingresos',this)">💰 Ingresos</button>
-<button class="adminOnly" onclick="show('config',this)">⚙️ Configuración</button>
-<button onclick="adminLogin()">🔐 Admin</button>
-<button class="adminOnly" onclick="logoutAdmin()">Salir</button>
+
+<button class="active" onclick="show('reservas',this)">
+📅 Reservas
+</button>
+
+<button onclick="show('nueva',this)">
+➕ Nueva
+</button>
+
+<button class="adminOnly" onclick="show('ingresos',this)">
+💰 Ingresos
+</button>
+
+<button class="adminOnly" onclick="show('config',this)">
+⚙️ Configuración
+</button>
+
+<button onclick="adminLogin()">
+🔐 Admin
+</button>
+
+<button class="adminOnly" onclick="logoutAdmin()">
+Salir
+</button>
+
 </div>
+
+
+<!-- RESERVAS -->
 
 <section id="reservas" class="page">
 
 <div class="card">
+
+<div class="weeknav">
+
+<button onclick="semanaAnterior()">◀️</button>
+
+<div id="weekTitle" class="weektitle"></div>
+
+<button onclick="semanaSiguiente()">▶️</button>
+
+</div>
+
 <div class="row">
-<label>
-Fecha
-<input id="viewDate" type="date" onchange="renderSlots()">
-</label>
-<button onclick="setToday()">Hoy</button>
+
+<button onclick="irSemanaActual()">
+📅 Esta semana
+</button>
+
 </div>
+
 </div>
+
 
 <div class="card">
-<h2>Horarios</h2>
+
 <div class="small">
-Cada reserva dura <span id="durText">90</span> minutos ·
-Precio €<span id="priceText">12</span>
+Reservas de 1 hora y 30 minutos ·
+€<span id="priceText">12</span>
 </div>
 
-<div id="slots" class="grid"></div>
+<br>
+
+<div id="week" class="week"></div>
+
 </div>
 
 </section>
 
+
+<!-- NUEVA RESERVA -->
 
 <section id="nueva" class="page hidden">
 
@@ -132,12 +308,16 @@ Pago
 </select>
 </label>
 
-<button onclick="createReservation()">Reservar</button>
+<button onclick="createReservation()">
+Reservar
+</button>
 
 </div>
 
 </section>
 
+
+<!-- INGRESOS -->
 
 <section id="ingresos" class="page hidden adminOnly">
 
@@ -148,8 +328,13 @@ Mes
 <input id="monthPick" type="month" onchange="renderIncome()">
 </label>
 
-<div class="money" id="total">€0.00</div>
-<div class="small" id="count">0 reservas cobradas</div>
+<div id="total" class="money">
+€0.00
+</div>
+
+<div id="count" class="small">
+0 reservas cobradas
+</div>
 
 </div>
 
@@ -158,6 +343,7 @@ Mes
 <div style="overflow:auto">
 
 <table>
+
 <thead>
 <tr>
 <th>Fecha</th>
@@ -173,10 +359,13 @@ Mes
 </table>
 
 </div>
+
 </div>
 
 </section>
 
+
+<!-- CONFIGURACIÓN -->
 
 <section id="config" class="page hidden adminOnly">
 
@@ -204,7 +393,9 @@ Fin
 <input id="end" type="time">
 </label>
 
-<button onclick="saveConfig()">Guardar configuración</button>
+<button onclick="saveConfig()">
+Guardar configuración
+</button>
 
 </div>
 
@@ -215,11 +406,14 @@ Fin
 
 <script>
 
-const SUPABASE_URL='https://jppsqrbpjwulzapyvpim.supabase.co';
+const SUPABASE_URL=
+'https://jppsqrbpjwulzapyvpim.supabase.co';
 
-const SUPABASE_KEY='sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
+const SUPABASE_KEY=
+'sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
 
-const API=SUPABASE_URL+'/rest/v1/reservas';
+const API=
+SUPABASE_URL+'/rest/v1/reservas';
 
 
 let data={
@@ -231,12 +425,28 @@ let data={
 };
 
 
-const today=new Date().toISOString().slice(0,10);
+function fechaLocal(){
 
-viewDate.value=today;
+ const d=new Date();
+
+ return d.getFullYear()+'-'+
+ String(d.getMonth()+1).padStart(2,'0')+'-'+
+ String(d.getDate()).padStart(2,'0');
+
+}
+
+
+const today=fechaLocal();
+
+let weekStart=new Date(today+'T12:00:00');
+
+
 date.value=today;
+
 monthPick.value=today.slice(0,7);
 
+
+/* ADMIN */
 
 function isAdmin(){
  return sessionStorage.getItem('padelAdmin')==='1';
@@ -254,7 +464,10 @@ function adminLogin(){
  if(p===saved){
 
   sessionStorage.setItem('padelAdmin','1');
+
   applyRole();
+
+  renderWeek();
 
   alert('Administrador activado');
 
@@ -273,6 +486,8 @@ function logoutAdmin(){
 
  applyRole();
 
+ renderWeek();
+
  show('reservas');
 
 }
@@ -286,6 +501,8 @@ function applyRole(){
 
 }
 
+
+/* NAVEGACIÓN */
 
 function show(id,b){
 
@@ -309,6 +526,8 @@ function show(id,b){
 
 }
 
+
+/* HORARIOS */
 
 function times(){
 
@@ -341,10 +560,6 @@ function times(){
 }
 
 
-/* CORRECCIÓN IMPORTANTE:
-   normaliza 09:00:00 -> 09:00
-*/
-
 function normalizarHora(h){
 
  if(!h)return '';
@@ -353,8 +568,6 @@ function normalizarHora(h){
 
 }
 
-
-/* Calcula correctamente el final de la reserva */
 
 function horaFin(t){
 
@@ -385,74 +598,264 @@ function esc(v){
 }
 
 
-/* Comprueba si una hora está ocupada */
+/* BUSCAR RESERVA */
 
 function reservaEnHorario(fecha,hora){
 
  return data.reservas.find(r=>
+
   String(r.fecha||'')===String(fecha) &&
-  normalizarHora(r.hora_inicio)===normalizarHora(hora) &&
+
+  normalizarHora(r.hora_inicio)===
+  normalizarHora(hora) &&
+
   String(r.estado||'').toLowerCase()!=='cancelada'
+
  );
 
 }
 
 
-/* Muestra los cuadros de horarios */
+/* FECHAS */
 
-function renderSlots(){
+function formatoFecha(d){
 
- let d=viewDate.value;
-
- slots.innerHTML=times().map(t=>{
-
-  let r=reservaEnHorario(d,t);
-
-  if(r){
-
-   return `
-   <div class="slot busy">
-    <b>${t}</b>
-    <br>
-    🔴 Ocupado
-    <br>
-    <span class="small">${esc(r.nombre||'')}</span>
-    ${
-     isAdmin()
-     ?
-     `<br><button class="danger" onclick="cancelar('${esc(r.id)}')">Cancelar</button>`
-     :
-     ''
-    }
-   </div>
-   `;
-
-  }
-
-  return `
-  <div class="slot">
-   <b>${t}</b>
-   <br>
-   🟢 Disponible
-   <br>
-   <button onclick="reserveAt('${d}','${t}')">
-    Reservar ${t}
-   </button>
-  </div>
-  `;
-
- }).join('');
-
- durText.textContent=data.duration;
-
- priceText.textContent=Number(data.price).toFixed(2);
+ return d.getFullYear()+'-'+
+ String(d.getMonth()+1).padStart(2,'0')+'-'+
+ String(d.getDate()).padStart(2,'0');
 
 }
 
 
-/* CORRECCIÓN:
-   al pulsar un cuadro, conserva exactamente esa hora
-*/
+function nombreDia(d){
+
+ return [
+  'Domingo',
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado'
+ ][d.getDay()];
+
+}
+
+
+function nombreMes(m){
+
+ return [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre'
+ ][m];
+
+}
+
+
+/* LUNES DE LA SEMANA */
+
+function obtenerLunes(d){
+
+ let x=new Date(d);
+
+ let dia=x.getDay();
+
+ let diferencia=dia===0?-6:1-dia;
+
+ x.setDate(x.getDate()+diferencia);
+
+ return x;
+
+}
+
+
+/* MOSTRAR SEMANA */
+
+function renderWeek(){
+
+ weekStart=obtenerLunes(weekStart);
+
+ let dias=[];
+
+ for(let i=0;i<7;i++){
+
+  let d=new Date(weekStart);
+
+  d.setDate(weekStart.getDate()+i);
+
+  dias.push(d);
+
+ }
+
+
+ let primero=dias[0];
+
+ let ultimo=dias[6];
+
+ weekTitle.textContent=
+  primero.getDate()+' '+
+  nombreMes(primero.getMonth())+
+  ' – '+
+  ultimo.getDate()+' '+
+  nombreMes(ultimo.getMonth())+
+  ' '+ultimo.getFullYear();
+
+
+ week.innerHTML=dias.map(d=>{
+
+  let fecha=formatoFecha(d);
+
+  let esHoy=fecha===today;
+
+  return `
+
+  <div class="day">
+
+   <div class="dayhead ${esHoy?'today':''}">
+
+    ${nombreDia(d)}
+    <br>
+    ${d.getDate()}/${String(d.getMonth()+1).padStart(2,'0')}
+
+   </div>
+
+   ${times().map(t=>{
+
+    let r=reservaEnHorario(fecha,t);
+
+    if(r){
+
+     let info='';
+
+     if(isAdmin()){
+
+      info=`
+
+      <div class="admininfo">
+
+       👤 <b>${esc(r.nombre||'Sin nombre')}</b>
+
+       ${r.telefono?
+       `<br>📞 ${esc(r.telefono)}`:''}
+
+       ${r.metodo_pago?
+       `<br>💳 ${esc(r.metodo_pago)}`:''}
+
+       <br>
+
+       <button class="danger"
+       onclick="cancelar('${esc(r.id)}')">
+       Cancelar
+       </button>
+
+      </div>
+
+      `;
+
+     }
+
+     return `
+
+     <div class="slot busy">
+
+      <b>${t}</b>
+
+      <br>
+
+      🔴 Ocupado
+
+      ${info}
+
+     </div>
+
+     `;
+
+    }
+
+
+    return `
+
+    <div class="slot">
+
+     <b>${t}</b>
+
+     <br>
+
+     🟢 Disponible
+
+     <br><br>
+
+     <button onclick="reserveAt('${fecha}','${t}')">
+
+      Reservar
+
+     </button>
+
+    </div>
+
+    `;
+
+   }).join('')}
+
+  </div>
+
+  `;
+
+ }).join('');
+
+}
+
+
+/* CAMBIAR SEMANA */
+
+function semanaAnterior(){
+
+ let d=new Date(weekStart);
+
+ d.setDate(d.getDate()-7);
+
+ weekStart=d;
+
+ renderWeek();
+
+}
+
+
+function semanaSiguiente(){
+
+ let d=new Date(weekStart);
+
+ d.setDate(d.getDate()+7);
+
+ weekStart=d;
+
+ renderWeek();
+
+}
+
+
+function irSemanaActual(){
+
+ weekStart=obtenerLunes(
+  new Date(today+'T12:00:00')
+ );
+
+ renderWeek();
+
+}
+
+
+/* RESERVAR DESDE UN CUADRO */
 
 function reserveAt(d,t){
 
@@ -460,17 +863,12 @@ function reserveAt(d,t){
 
  render();
 
- time.value=t;
-
  showWithoutReset('nueva');
 
  time.value=t;
 
 }
 
-
-/* Igual que show(), pero NO vuelve a reconstruir
-   la selección de hora */
 
 function showWithoutReset(id){
 
@@ -489,7 +887,7 @@ function showWithoutReset(id){
 }
 
 
-/* Render general */
+/* RENDER */
 
 function render(){
 
@@ -511,7 +909,7 @@ function render(){
   time.value=oldTime;
  }
 
- renderSlots();
+ renderWeek();
 
  renderIncome();
 
@@ -519,8 +917,6 @@ function render(){
 
 }
 
-
-/* Render sin cambiar la hora seleccionada */
 
 function renderWithoutChangingTime(){
 
@@ -532,7 +928,7 @@ function renderWithoutChangingTime(){
 
  end.value=data.end;
 
- renderSlots();
+ renderWeek();
 
  renderIncome();
 
@@ -541,7 +937,7 @@ function renderWithoutChangingTime(){
 }
 
 
-/* Cargar reservas desde Supabase */
+/* SUPABASE */
 
 async function cargarNube(){
 
@@ -557,18 +953,28 @@ async function cargarNube(){
    }
   );
 
-  if(!r.ok)throw Error(await r.text());
+
+  if(!r.ok){
+
+   throw Error(await r.text());
+
+  }
+
 
   data.reservas=await r.json();
+
 
   localStorage.setItem(
    'padelReservas',
    JSON.stringify(data.reservas)
   );
 
-  cloudStatus.textContent='🟢 Conectado a Supabase';
+
+  cloudStatus.textContent=
+   '🟢 Conectado a Supabase';
 
   cloudStatus.className='status ok';
+
 
  }catch(e){
 
@@ -586,7 +992,7 @@ async function cargarNube(){
 }
 
 
-/* Crear reserva */
+/* CREAR RESERVA */
 
 async function createReservation(){
 
@@ -605,8 +1011,6 @@ async function createReservation(){
 
  }
 
-
- /* Comprobación correcta de hora */
 
  if(reservaEnHorario(d,t)){
 
@@ -644,13 +1048,16 @@ async function createReservation(){
    API,
    {
     method:'POST',
+
     headers:{
      apikey:SUPABASE_KEY,
      Authorization:'Bearer '+SUPABASE_KEY,
      'Content-Type':'application/json',
      Prefer:'return=representation'
     },
+
     body:JSON.stringify(r)
+
    }
   );
 
@@ -662,10 +1069,8 @@ async function createReservation(){
   }
 
 
-  /* Usamos directamente la respuesta de Supabase
-     para que el horario se marque inmediatamente */
-
   let resultado=await resp.json();
+
 
   if(Array.isArray(resultado)&&resultado.length){
 
@@ -686,27 +1091,30 @@ async function createReservation(){
 
   alert('Reserva registrada');
 
+
   player.value='';
 
   phone.value='';
 
 
-  /* Volvemos al calendario */
+  weekStart=obtenerLunes(
+   new Date(d+'T12:00:00')
+  );
 
-  viewDate.value=d;
 
   showWithoutReset('reservas');
 
-  renderSlots();
+  renderWeek();
 
-
-  /* Actualizamos nuevamente desde Supabase */
 
   await cargarNube();
 
-  viewDate.value=d;
 
-  renderSlots();
+  weekStart=obtenerLunes(
+   new Date(d+'T12:00:00')
+  );
+
+  renderWeek();
 
 
  }catch(e){
@@ -721,7 +1129,7 @@ async function createReservation(){
 }
 
 
-/* Cancelar reserva */
+/* CANCELAR */
 
 async function cancelar(id){
 
@@ -740,22 +1148,33 @@ async function cancelar(id){
  try{
 
   let r=await fetch(
-   API+'?id=eq.'+encodeURIComponent(id),
+
+   API+'?id=eq.'+
+   encodeURIComponent(id),
+
    {
     method:'PATCH',
+
     headers:{
      apikey:SUPABASE_KEY,
      Authorization:'Bearer '+SUPABASE_KEY,
      'Content-Type':'application/json'
     },
+
     body:JSON.stringify({
      estado:'Cancelada'
     })
+
    }
+
   );
 
 
-  if(!r.ok)throw Error(await r.text());
+  if(!r.ok){
+
+   throw Error(await r.text());
+
+  }
 
 
   await cargarNube();
@@ -773,44 +1192,63 @@ async function cancelar(id){
 }
 
 
-/* Ingresos */
+/* INGRESOS */
 
 function renderIncome(){
 
  if(!isAdmin())return;
 
+
  let m=monthPick.value;
 
+
  let rs=data.reservas.filter(r=>
+
   String(r.fecha||'').startsWith(m)&&
+
   r.metodo_pago&&
+
   r.metodo_pago!=='Pendiente'&&
+
   String(r.estado||'').toLowerCase()!=='cancelada'
+
  );
 
- let total=rs.length*Number(data.price);
+
+ let total=
+  rs.length*Number(data.price);
+
 
  document.getElementById('total').textContent=
   '€'+total.toFixed(2);
+
 
  document.getElementById('count').textContent=
   rs.length+' reservas cobradas';
 
 
  incomeRows.innerHTML=rs.map(r=>
+
   `<tr>
+
    <td>${esc(r.fecha)}</td>
+
    <td>${esc(normalizarHora(r.hora_inicio))}</td>
+
    <td>${esc(r.nombre)}</td>
+
    <td>${esc(r.metodo_pago)}</td>
+
    <td>€${Number(data.price).toFixed(2)}</td>
+
   </tr>`
+
  ).join('');
 
 }
 
 
-/* Configuración */
+/* CONFIGURACIÓN */
 
 function saveConfig(){
 
@@ -823,13 +1261,17 @@ function saveConfig(){
  }
 
 
- data.price=Number(price.value)||12;
+ data.price=
+  Number(price.value)||12;
 
- data.duration=Number(duration.value)||90;
+ data.duration=
+  Number(duration.value)||90;
 
- data.start=start.value||'09:00';
+ data.start=
+  start.value||'09:00';
 
- data.end=end.value||'00:00';
+ data.end=
+  end.value||'00:00';
 
 
  localStorage.setItem(
@@ -846,7 +1288,7 @@ function saveConfig(){
 }
 
 
-/* Recuperar configuración */
+/* CONFIGURACIÓN GUARDADA */
 
 let cfg=JSON.parse(
  localStorage.getItem('padelConfig')||'null'
@@ -866,7 +1308,11 @@ if(cfg){
 }
 
 
-/* Arranque */
+/* INICIO */
+
+weekStart=obtenerLunes(
+ new Date(today+'T12:00:00')
+);
 
 render();
 
