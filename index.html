@@ -146,7 +146,7 @@ function renderSlots(){
  $('priceText').textContent=Number(data.price).toFixed(2);
 }
 
-function reserveAt(d,t){$('date').value=d;render();$('time').value=t;show('nueva')}
+function reserveAt(d,t){$('date').value=d;show('nueva');$('time').value=t}
 
 async function cargarNube(){
  try{
