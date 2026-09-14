@@ -180,7 +180,6 @@ th,td{
   grid-template-columns:repeat(7,145px);
  }
 }
-
 </style>
 </head>
 
@@ -227,9 +226,6 @@ Salir
 
 </div>
 
-
-<!-- RESERVAS -->
-
 <section id="reservas" class="page">
 
 <div class="card">
@@ -254,7 +250,6 @@ Salir
 
 </div>
 
-
 <div class="card">
 
 <div class="small">
@@ -269,9 +264,6 @@ Reservas de 1 hora y 30 minutos ·
 </div>
 
 </section>
-
-
-<!-- NUEVA RESERVA -->
 
 <section id="nueva" class="page hidden">
 
@@ -315,9 +307,6 @@ Reservar
 </div>
 
 </section>
-
-
-<!-- INGRESOS -->
 
 <section id="ingresos" class="page hidden adminOnly">
 
@@ -364,9 +353,6 @@ Mes
 
 </section>
 
-
-<!-- CONFIGURACIÓN -->
-
 <section id="config" class="page hidden adminOnly">
 
 <div class="card">
@@ -403,16 +389,15 @@ Guardar configuración
 
 </main>
 
-
 <script>
 
-const SUPABASE_URL=
+const SUPABASE_URL =
 'https://jppsqrbpjwulzapyvpim.supabase.co';
 
-const SUPABASE_KEY=
+const SUPABASE_KEY =
 'sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
 
-const API=
+const API =
 SUPABASE_URL+'/rest/v1/reservas';
 
 
@@ -441,15 +426,10 @@ const today=fechaLocal();
 let weekStart=new Date(today+'T12:00:00');
 
 
-date.value=today;
-
-monthPick.value=today.slice(0,7);
-
-
-/* ADMIN */
-
 function isAdmin(){
+
  return sessionStorage.getItem('padelAdmin')==='1';
+
 }
 
 
@@ -496,13 +476,13 @@ function logoutAdmin(){
 function applyRole(){
 
  document.querySelectorAll('.adminOnly').forEach(e=>{
+
   e.style.display=isAdmin()?'':'none';
+
  });
 
 }
 
-
-/* NAVEGACIÓN */
 
 function show(id,b){
 
@@ -526,8 +506,6 @@ function show(id,b){
 
 }
 
-
-/* HORARIOS */
 
 function times(){
 
@@ -598,16 +576,14 @@ function esc(v){
 }
 
 
-/* BUSCAR RESERVA */
-
 function reservaEnHorario(fecha,hora){
 
  return data.reservas.find(r=>
 
-  String(r.fecha||'')===String(fecha) &&
+  String(r.fecha||'')===String(fecha)&&
 
   normalizarHora(r.hora_inicio)===
-  normalizarHora(hora) &&
+  normalizarHora(hora)&&
 
   String(r.estado||'').toLowerCase()!=='cancelada'
 
@@ -615,8 +591,6 @@ function reservaEnHorario(fecha,hora){
 
 }
 
-
-/* FECHAS */
 
 function formatoFecha(d){
 
@@ -662,8 +636,6 @@ function nombreMes(m){
 }
 
 
-/* LUNES DE LA SEMANA */
-
 function obtenerLunes(d){
 
  let x=new Date(d);
@@ -679,8 +651,6 @@ function obtenerLunes(d){
 }
 
 
-/* MOSTRAR SEMANA */
-
 function renderWeek(){
 
  weekStart=obtenerLunes(weekStart);
@@ -691,12 +661,11 @@ function renderWeek(){
 
   let d=new Date(weekStart);
 
-  d.setDate(weekStart.getDate()+i);
+  d.setDate(d.getDate()+i);
 
   dias.push(d);
 
  }
-
 
  let primero=dias[0];
 
@@ -717,6 +686,7 @@ function renderWeek(){
 
   let esHoy=fecha===today;
 
+
   return `
 
   <div class="day">
@@ -729,13 +699,16 @@ function renderWeek(){
 
    </div>
 
+
    ${times().map(t=>{
 
     let r=reservaEnHorario(fecha,t);
 
+
     if(r){
 
      let info='';
+
 
      if(isAdmin()){
 
@@ -753,9 +726,12 @@ function renderWeek(){
 
        <br>
 
-       <button class="danger"
-       onclick="cancelar('${esc(r.id)}')">
-       Cancelar
+       <button
+        class="danger"
+        onclick="cancelar(${Number(r.id)})">
+
+        Cancelar
+
        </button>
 
       </div>
@@ -763,6 +739,7 @@ function renderWeek(){
       `;
 
      }
+
 
      return `
 
@@ -805,18 +782,18 @@ function renderWeek(){
 
     `;
 
+
    }).join('')}
 
   </div>
 
   `;
 
+
  }).join('');
 
 }
 
-
-/* CAMBIAR SEMANA */
 
 function semanaAnterior(){
 
@@ -855,13 +832,9 @@ function irSemanaActual(){
 }
 
 
-/* RESERVAR DESDE UN CUADRO */
-
 function reserveAt(d,t){
 
  date.value=d;
-
- render();
 
  showWithoutReset('nueva');
 
@@ -887,8 +860,6 @@ function showWithoutReset(id){
 }
 
 
-/* RENDER */
-
 function render(){
 
  price.value=data.price;
@@ -899,15 +870,21 @@ function render(){
 
  end.value=data.end;
 
+
  let oldTime=time.value;
+
 
  time.innerHTML=times().map(t=>
   `<option value="${t}">${t}</option>`
  ).join('');
 
+
  if(times().includes(oldTime)){
+
   time.value=oldTime;
+
  }
+
 
  renderWeek();
 
@@ -928,6 +905,12 @@ function renderWithoutChangingTime(){
 
  end.value=data.end;
 
+
+ time.innerHTML=times().map(t=>
+  `<option value="${t}">${t}</option>`
+ ).join('');
+
+
  renderWeek();
 
  renderIncome();
@@ -937,20 +920,21 @@ function renderWithoutChangingTime(){
 }
 
 
-/* SUPABASE */
-
 async function cargarNube(){
 
  try{
 
   let r=await fetch(
+
    API+'?select=*&order=fecha.asc,hora_inicio.asc',
+
    {
     headers:{
      apikey:SUPABASE_KEY,
      Authorization:'Bearer '+SUPABASE_KEY
     }
    }
+
   );
 
 
@@ -982,17 +966,17 @@ async function cargarNube(){
    localStorage.getItem('padelReservas')||'[]'
   );
 
+
   cloudStatus.textContent=
    '🟡 Supabase no responde; usando datos de este móvil';
 
  }
 
+
  render();
 
 }
 
-
-/* CREAR RESERVA */
 
 async function createReservation(){
 
@@ -1045,7 +1029,9 @@ async function createReservation(){
  try{
 
   let resp=await fetch(
+
    API,
+
    {
     method:'POST',
 
@@ -1059,6 +1045,7 @@ async function createReservation(){
     body:JSON.stringify(r)
 
    }
+
   );
 
 
@@ -1114,6 +1101,7 @@ async function createReservation(){
    new Date(d+'T12:00:00')
   );
 
+
   renderWeek();
 
 
@@ -1129,7 +1117,9 @@ async function createReservation(){
 }
 
 
-/* CANCELAR */
+/* =========================
+   CANCELAR RESERVA
+   ========================= */
 
 async function cancelar(id){
 
@@ -1142,15 +1132,30 @@ async function cancelar(id){
  }
 
 
- if(!confirm('¿Cancelar esta reserva?'))return;
+ const numeroId=Number(id);
+
+
+ if(!Number.isInteger(numeroId)){
+
+  alert('No se pudo identificar la reserva.');
+
+  return;
+
+ }
+
+
+ if(!confirm('¿Cancelar esta reserva?')){
+
+  return;
+
+ }
 
 
  try{
 
-  let r=await fetch(
+  const respuesta=await fetch(
 
-   API+'?id=eq.'+
-   encodeURIComponent(id),
+   API+'?id=eq.'+numeroId,
 
    {
     method:'PATCH',
@@ -1158,7 +1163,8 @@ async function cancelar(id){
     headers:{
      apikey:SUPABASE_KEY,
      Authorization:'Bearer '+SUPABASE_KEY,
-     'Content-Type':'application/json'
+     'Content-Type':'application/json',
+     Prefer:'return=representation'
     },
 
     body:JSON.stringify({
@@ -1170,11 +1176,28 @@ async function cancelar(id){
   );
 
 
-  if(!r.ok){
+  if(!respuesta.ok){
 
-   throw Error(await r.text());
+   const texto=await respuesta.text();
+
+   throw Error(texto);
 
   }
+
+
+  const resultado=await respuesta.json();
+
+
+  if(Array.isArray(resultado)&&resultado.length===0){
+
+   throw Error(
+    'Supabase no encontró esa reserva.'
+   );
+
+  }
+
+
+  alert('Reserva cancelada correctamente');
 
 
   await cargarNube();
@@ -1183,7 +1206,7 @@ async function cancelar(id){
  }catch(e){
 
   alert(
-   'No se pudo cancelar.\n'+
+   'No se pudo cancelar la reserva.\n\n'+
    e.message
   );
 
@@ -1191,8 +1214,6 @@ async function cancelar(id){
 
 }
 
-
-/* INGRESOS */
 
 function renderIncome(){
 
@@ -1248,8 +1269,6 @@ function renderIncome(){
 }
 
 
-/* CONFIGURACIÓN */
-
 function saveConfig(){
 
  if(!isAdmin()){
@@ -1264,11 +1283,14 @@ function saveConfig(){
  data.price=
   Number(price.value)||12;
 
+
  data.duration=
   Number(duration.value)||90;
 
+
  data.start=
   start.value||'09:00';
+
 
  data.end=
   end.value||'00:00';
@@ -1288,8 +1310,6 @@ function saveConfig(){
 }
 
 
-/* CONFIGURACIÓN GUARDADA */
-
 let cfg=JSON.parse(
  localStorage.getItem('padelConfig')||'null'
 );
@@ -1308,15 +1328,20 @@ if(cfg){
 }
 
 
-/* INICIO */
+date.value=today;
+
+monthPick.value=today.slice(0,7);
+
 
 weekStart=obtenerLunes(
  new Date(today+'T12:00:00')
 );
 
+
 render();
 
 cargarNube();
+
 
 setInterval(cargarNube,15000);
 
