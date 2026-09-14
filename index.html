@@ -1,589 +1,888 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pádel Beariz</title>
-<link rel="icon" type="image/png" href="Icono moderno de pádel Beariz.png">
-<link rel="apple-touch-icon" href="Icono moderno de pádel Beariz.png">
-
 <style>
-body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#222}
-header{background:#123b5d;color:white;padding:18px;text-align:center}
-header h1{margin:0;font-size:25px}
-nav{display:flex;gap:5px;padding:8px;background:white;overflow:auto}
-nav button{border:0;padding:10px 12px;border-radius:8px;background:#e8edf1;white-space:nowrap}
-main{max-width:700px;margin:auto;padding:12px}
-.card{background:white;border-radius:12px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px #0001}
-h2{margin-top:0}
-input,select{width:100%;box-sizing:border-box;padding:11px;margin:5px 0 10px;border:1px solid #ccc;border-radius:8px}
-button{cursor:pointer}
-.primary{background:#123b5d;color:white;border:0;padding:12px 16px;border-radius:8px}
-.slot{padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:8px;background:#fff}
-.slot.ocupado{background:#eee;color:#777}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:7px;border-bottom:1px solid #ddd;text-align:left}
-.smallbtn{padding:6px;border:0;border-radius:6px;margin:2px}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17221b}
+header{background:#123b2a;color:#fff;padding:18px}
+.wrap{max-width:980px;margin:auto;padding:16px}
+h1{margin:0 0 4px}
+.sub{opacity:.85}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+button{border:0;border-radius:10px;padding:11px 14px;background:#1e7a55;color:#fff;font-weight:700}
+button.active{background:#f2a900}
+.danger{background:#b3261e}
+.card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}
+.slot.busy{background:#ffe5e5;border-color:#f4b3b3}
+.small{font-size:13px;color:#68746d}
+.hidden{display:none}
+.status{padding:10px;border-radius:10px;background:#fff3cd}
+.ok{background:#dff4e7}
+.money{font-size:30px;font-weight:800}
+input,select{width:100%;padding:11px;border:1px solid #ccd5cf;border-radius:9px;margin:5px 0 10px}
+label{font-weight:700}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}
+th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
+@media(max-width:600px){
+.wrap{padding:10px}
+.tabs button{flex:1 1 45%}
+table{font-size:13px}
+}
 </style>
 </head>
 
 <body>
 
 <header>
+<div class="wrap">
 <h1>🎾 Pádel Beariz</h1>
-<p>Reserva tu pista</p>
+<div class="sub">Reservas · Ingresos</div>
+</div>
 </header>
 
-<nav>
+<main class="wrap">
+
+<div id="cloudStatus" class="status">🟡 Conectando…</div>
+
+<div class="tabs">
+<button class="active" onclick="show('reservas',this)">📅 Reservas</button>
+<button onclick="show('nueva',this)">➕ Nueva</button>
+<button class="adminOnly" onclick="show('ingresos',this)">💰 Ingresos</button>
+<button class="adminOnly" onclick="show('config',this)">⚙️ Configuración</button>
+<button onclick="adminLogin()">🔐 Admin</button>
 <button onclick="show('reservas')">🏠 Inicio</button>
-<button onclick="show('reservas')">Reservas</button>
-<button onclick="show('nueva')">Nueva</button>
-<button onclick="show('ingresos')">Ingresos</button>
-<button onclick="show('config')">Configuración</button>
-<button onclick="show('admin')">Admin</button>
-<button onclick="logout()">Salir</button>
-</nav>
+<button class="adminOnly" onclick="logoutAdmin()">Salir</button>
+</div>
 
-<main>
+<section id="reservas" class="page">
 
-<section id="reservas" class="card">
-<h2>Reservas</h2>
-<div id="listaReservas">Cargando...</div>
+<div class="card">
+<div class="row">
+<label>Fecha
+<input id="viewDate" type="date" onchange="renderSlots()">
+</label>
+<button onclick="setToday()">Hoy</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Horarios</h2>
+<div class="small">
+Cada reserva dura <span id="durText">90</span> minutos ·
+Precio €<span id="priceText">12</span>
+</div>
+<div id="slots" class="grid"></div>
+</div>
+
+<div class="card">
+<h2>📋 Reservas registradas</h2>
+<div id="reservationList">No hay reservas para esta fecha.</div>
+</div>
+
 </section>
 
-<section id="nueva" class="card" style="display:none">
-<h2>Nueva reserva</h2>
+<section id="nueva" class="page hidden">
 
-<button onclick="show('reservas')" style="margin-bottom:10px">🏠 Inicio</button>
+<div class="card">
+<h2>➕ Nueva reserva</h2>
 
-<label>Fecha</label>
-<input type="date" id="date" onchange="render()">
+<label>Fecha
+<input id="date" type="date">
+</label>
 
-<label>Hora</label>
+<label>Hora
 <select id="time"></select>
+</label>
 
-<label>Nombre</label>
-<input id="nombre" placeholder="Nombre">
+<label>Nombre
+<input id="player" placeholder="Nombre del jugador">
+</label>
 
-<label>Teléfono</label>
-<input id="telefono" placeholder="Teléfono">
+<label>Teléfono
+<input id="phone" inputmode="tel" placeholder="Teléfono">
+</label>
 
-<label>Pago</label>
-<select id="pago">
+<label>Pago
+<select id="pay">
 <option>Pendiente</option>
 <option>Efectivo</option>
 <option>Tarjeta</option>
 </select>
+</label>
 
-<button class="primary" onclick="createReservation()">Reservar pista</button>
+<button onclick="createReservation()">Reservar</button>
+<button onclick="show('reservas')">🏠 Inicio</button>
+
+</div>
 </section>
 
-<section id="ingresos" class="card" style="display:none">
-<h2>Ingresos</h2>
-<label>Mes</label>
-<input type="month" id="mesIngreso" onchange="renderIncome()">
-<div id="tablaIngresos"></div>
+<section id="ingresos" class="page hidden adminOnly">
+
+<div class="card">
+<label>Mes
+<input id="monthPick" type="month" onchange="renderIncome()">
+</label>
+
+<div class="money" id="total">€0.00</div>
+<div class="small" id="count">0 reservas cobradas</div>
+</div>
+
+<div class="card">
+<div style="overflow:auto">
+<table>
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Hora</th>
+<th>Jugador</th>
+<th>Pago</th>
+<th>Importe</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="incomeRows"></tbody>
+</table>
+</div>
+</div>
+
 </section>
 
-<section id="config" class="card" style="display:none">
-<h2>Configuración</h2>
+<section id="config" class="page hidden adminOnly">
 
-<label>Precio de la pista (€)</label>
-<input type="number" id="precioConfig" min="0">
+<div class="card">
+<h2>⚙️ Configuración</h2>
 
-<button class="primary" onclick="saveConfig()">Guardar configuración</button>
-</section>
+<label>Precio (€)
+<input id="price" type="number" step="0.50">
+</label>
 
-<section id="admin" class="card" style="display:none">
-<h2>Administración</h2>
-<p id="adminEstado">Administrador no conectado.</p>
-<button class="primary" onclick="adminLogin()">Entrar como administrador</button>
+<label>Duración (minutos)
+<input id="duration" type="number" step="30">
+</label>
+
+<label>Inicio
+<input id="start" type="time">
+</label>
+
+<label>Fin
+<input id="end" type="time">
+</label>
+
+<button onclick="saveConfig()">Guardar configuración</button>
+
+</div>
 </section>
 
 </main>
 
 <script>
+
 const SUPABASE_URL='https://jppsqrbpjwulzapyvpim.supabase.co';
 const SUPABASE_KEY='sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
 const API=SUPABASE_URL+'/rest/v1/reservas';
 
 let data={
-  reservas:[],
-  price:Number(localStorage.getItem('padelPrice')||12)
+reservas:[],
+price:12,
+duration:90,
+start:'09:00',
+end:'00:00'
 };
 
-function headers(extra={}){
-  return Object.assign({
-    apikey:SUPABASE_KEY,
-    Authorization:'Bearer '+SUPABASE_KEY
-  },extra);
+const $=id=>document.getElementById(id);
+
+function init(){
+
+const today=new Date().toISOString().slice(0,10);
+
+$('viewDate').value=today;
+$('date').value=today;
+$('monthPick').value=today.slice(0,7);
+
+let cfg=JSON.parse(localStorage.getItem('padelConfig')||'null');
+
+if(cfg){
+data.price=Number(cfg.price)||12;
+data.duration=Number(cfg.duration)||90;
+data.start=cfg.start||'09:00';
+data.end=cfg.end||'00:00';
 }
-
-function isAdmin(){
-  return sessionStorage.getItem('padelAdmin')==='1';
-}
-
-function show(id){
-  ['reservas','nueva','ingresos','config','admin'].forEach(x=>{
-    const e=document.getElementById(x);
-    if(e)e.style.display=x===id?'block':'none';
-  });
-
-  if(id==='reservas')cargarNube();
-  if(id==='ingresos')renderIncome();
-  if(id==='config'){
-    document.getElementById('precioConfig').value=data.price;
-  }
-}
-
-function adminLogin(){
-  let pin=prompt('Contraseña de administrador:');
-  if(pin===null)return;
-
-  const guardada=localStorage.getItem('padelPin')||'1234';
-
-  if(pin===guardada){
-    sessionStorage.setItem('padelAdmin','1');
-    document.getElementById('adminEstado').textContent='Administrador conectado.';
-    alert('Acceso correcto.');
-    show('reservas');
-  }else{
-    alert('Contraseña incorrecta.');
-  }
-}
-
-function logout(){
-  sessionStorage.removeItem('padelAdmin');
-  alert('Sesión cerrada.');
-  show('reservas');
-}
-
-const horas=[];
-for(let h=9;h<=22;h++){
-  const hh=String(h).padStart(2,'0');
-  horas.push(hh+':00');
-  horas.push(hh+':30');
-}
-horas.push('23:00');
-horas.push('23:30');
-
-function fechaHoy(){
-  const d=new Date();
-  return d.getFullYear()+'-'+
-    String(d.getMonth()+1).padStart(2,'0')+'-'+
-    String(d.getDate()).padStart(2,'0');
-}
-
-document.getElementById('date').value=fechaHoy();
-
-function horaFin(hora){
-  let [h,m]=hora.split(':').map(Number);
-  let minutos=h*60+m+90;
-  let fh=Math.floor(minutos/60);
-  let fm=minutos%60;
-  return String(fh).padStart(2,'0')+':'+String(fm).padStart(2,'0');
-}
-
-function ocupado(fecha,hora){
-  return data.reservas.some(r=>{
-    if(String(r.fecha)!==String(fecha))return false;
-    if(String(r.estado||'')==='Cancelada')return false;
-    if(String(r.estado||'')==='Regalada')return true;
-
-    const ini=String(r.hora_inicio||'').slice(0,5);
-    const fin=String(r.hora_fin||'').slice(0,5);
-
-    const a=hora.split(':').map(Number);
-    const b=ini.split(':').map(Number);
-    const c=fin.split(':').map(Number);
-
-    const x=a[0]*60+a[1];
-    const y=b[0]*60+b[1];
-    const z=c[0]*60+c[1];
-
-    return x<z && x+90>y;
-  });
-}
-
-function render(){
-  const fecha=document.getElementById('date').value;
-  const selector=document.getElementById('time');
-
-  selector.innerHTML=horas.map(h=>{
-    const o=ocupado(fecha,h);
-    return '<option value="'+h+'" '+(o?'disabled':'')+'>'+
-      h+(o?' — OCUPADA':'')+
-      '</option>';
-  }).join('');
-}
-
-function reserveAt(d,t){
-  document.getElementById('date').value=d;
-  render();
-  document.getElementById('time').value=t;
-  show('nueva');
-}
-
-async function cargarNube(){
-  try{
-    const r=await fetch(API+'?select=*&order=fecha.asc,hora_inicio.asc',{
-      headers:headers()
-    });
-
-    if(!r.ok)throw Error(await r.text());
-
-    data.reservas=await r.json();
-    renderSlots();
-    renderIncome();
-    render();
-  }catch(e){
-    document.getElementById('listaReservas').innerHTML=
-      '<p>No se pudieron cargar las reservas.</p>';
-  }
-}
-
-function renderSlots(){
-  const cont=document.getElementById('listaReservas');
-
-  if(!data.reservas.length){
-    cont.innerHTML='<p>No hay reservas registradas.</p>';
-    return;
-  }
-
-  cont.innerHTML=data.reservas.map(r=>{
-    const cancelada=String(r.estado||'')==='Cancelada';
-    const regalada=String(r.estado||'')==='Regalada';
-
-    return `
-    <div class="slot ${cancelada?'ocupado':''}">
-      <b>${r.fecha||''}</b>
-      — ${String(r.hora_inicio||'').slice(0,5)}
-      a ${String(r.hora_fin||'').slice(0,5)}
-      <br>
-      👤 ${r.nombre||r.usuario||''}
-      ${r.telefono?'<br>📞 '+r.telefono:''}
-      <br>
-      Estado: <b>${r.estado||''}</b>
-      ${regalada?'<br>🎁 Pista regalada':''}
-      ${cancelada?'<br>❌ Cancelada':''}
-
-      ${!cancelada?`
-      <br>
-      <button class="smallbtn"
-        onclick="solicitarCancelacion('${r.id}','${String(r.telefono||'').replace(/'/g,"\\'")}')">
-        Solicitar cancelación
-      </button>`:''}
-
-      ${isAdmin()&&!cancelada?`
-      <button class="smallbtn"
-        onclick="cancelar('${r.id}')">
-        Cancelar
-      </button>`:''}
-    </div>`;
-  }).join('');
-}
-
-async function createReservation(){
-  const fecha=document.getElementById('date').value;
-  const hora=document.getElementById('time').value;
-  const nombre=document.getElementById('nombre').value.trim();
-  const telefono=document.getElementById('telefono').value.trim();
-  const pago=document.getElementById('pago').value;
-
-  if(!fecha||!hora||!nombre||!telefono){
-    alert('Completa todos los datos.');
-    return;
-  }
-
-  if(ocupado(fecha,hora)){
-    alert('Ese horario ya está ocupado.');
-    await cargarNube();
-    return;
-  }
-
-  const body={
-    pista:1,
-    usuario:nombre,
-    fecha:fecha,
-    hora_inicio:hora,
-    hora_fin:horaFin(hora),
-    precio:data.price,
-    metodo_pago:pago,
-    estado:'Pendiente',
-    nombre:nombre,
-    telefono:telefono
-  };
-
-  try{
-    const r=await fetch(API,{
-      method:'POST',
-      headers:headers({
-        'Content-Type':'application/json',
-        'Prefer':'return=representation'
-      }),
-      body:JSON.stringify(body)
-    });
-
-    if(!r.ok)throw Error(await r.text());
-
-    document.getElementById('nombre').value='';
-    document.getElementById('telefono').value='';
-    document.getElementById('pago').value='Pendiente';
-
-    alert('Reserva realizada correctamente.');
-
-    await cargarNube();
-    show('reservas');
-
-  }catch(e){
-    alert('No se pudo guardar la reserva.\n'+e.message);
-  }
-}
-
-async function solicitarCancelacion(id,telefono){
-  const tel=prompt('Para solicitar la cancelación, introduce el teléfono usado en la reserva:');
-
-  if(tel===null)return;
-
-  const limpio=x=>String(x||'').replace(/\D/g,'');
-
-  if(limpio(tel)!==limpio(telefono)){
-    alert('El teléfono no coincide con la reserva.');
-    return;
-  }
-
-  if(!confirm('¿Solicitar al administrador la cancelación de esta pista?'))return;
-
-  try{
-    const r=await fetch(API+'?id=eq.'+encodeURIComponent(id),{
-      method:'PATCH',
-      headers:headers({
-        'Content-Type':'application/json',
-        'Prefer':'return=representation'
-      }),
-      body:JSON.stringify({estado:'Solicitud de cancelación'})
-    });
-
-    if(!r.ok)throw Error(await r.text());
-
-    alert('Solicitud enviada al administrador.');
-    await cargarNube();
-
-  }catch(e){
-    alert('No se pudo solicitar la cancelación.\n'+e.message);
-  }
-}
-
-async function cancelar(id){
-  if(!isAdmin()){
-    alert('Solo el administrador puede cancelar.');
-    return;
-  }
-
-  if(!confirm('¿Cancelar esta reserva?'))return;
-
-  try{
-    const r=await fetch(API+'?id=eq.'+encodeURIComponent(id),{
-      method:'PATCH',
-      headers:headers({
-        'Content-Type':'application/json',
-        'Prefer':'return=representation'
-      }),
-      body:JSON.stringify({estado:'Cancelada'})
-    });
-
-    if(!r.ok)throw Error(await r.text());
-
-    await cargarNube();
-    alert('Reserva cancelada.');
-
-  }catch(e){
-    alert('No se pudo cancelar.\n'+e.message);
-  }
-}
-
-function renderIncome(){
-  const box=document.getElementById('tablaIngresos');
-  if(!box)return;
-
-  if(!isAdmin()){
-    box.innerHTML='<p>Solo el administrador puede ver los ingresos.</p>';
-    return;
-  }
-
-  const mes=document.getElementById('mesIngreso').value ||
-    new Date().toISOString().slice(0,7);
-
-  const rs=data.reservas.filter(r=>
-    String(r.fecha||'').startsWith(mes) &&
-    r.metodo_pago &&
-    r.metodo_pago!=='Pendiente' &&
-    r.metodo_pago!=='Regalada' &&
-    String(r.estado||'')!=='Cancelada'
-  );
-
-  const total=rs.reduce((a,r)=>
-    a+Number(r.precio ?? data.price),0);
-
-  if(!rs.length){
-    box.innerHTML='<p>Total del mes: <b>0 €</b></p><p>No hay ingresos registrados.</p>';
-    return;
-  }
-
-  box.innerHTML=`
-  <p><b>Total del mes: ${total.toFixed(2)} €</b></p>
-
-  <div style="overflow:auto">
-  <table>
-  <thead>
-  <tr>
-    <th>Fecha</th>
-    <th>Hora</th>
-    <th>Nombre</th>
-    <th>Importe</th>
-    <th>Pago</th>
-    <th>Acción</th>
-  </tr>
-  </thead>
-  <tbody>
-  ${rs.map(r=>`
-    <tr>
-      <td>${r.fecha||''}</td>
-      <td>${String(r.hora_inicio||'').slice(0,5)}</td>
-      <td>${r.nombre||r.usuario||''}</td>
-      <td>${Number(r.precio ?? data.price).toFixed(2)} €</td>
-      <td>${r.metodo_pago||''}</td>
-      <td>
-        <button class="smallbtn" onclick="editarIngreso('${r.id}')">Editar</button>
-        <button class="smallbtn" onclick="regalarIngreso('${r.id}')">Regalar</button>
-        <button class="smallbtn" onclick="borrarIngreso('${r.id}')">Borrar</button>
-      </td>
-    </tr>
-  `).join('')}
-  </tbody>
-  </table>
-  </div>`;
-}
-
-async function editarIngreso(id){
-  if(!isAdmin())return alert('Solo el administrador');
-
-  let r=data.reservas.find(x=>String(x.id)===String(id));
-  if(!r)return alert('Reserva no encontrada');
-
-  let precio=prompt(
-    'Importe de esta reserva (€):',
-    String(r.precio ?? data.price)
-  );
-
-  if(precio===null)return;
-
-  precio=Number(precio);
-
-  if(!Number.isFinite(precio)||precio<0){
-    alert('Importe no válido');
-    return;
-  }
-
-  let pago=prompt(
-    'Forma de pago (Efectivo, Tarjeta o Pendiente):',
-    r.metodo_pago||'Pendiente'
-  );
-
-  if(pago===null)return;
-
-  await actualizarIngreso(id,{
-    precio:precio,
-    metodo_pago:pago,
-    estado:pago==='Pendiente'?'Pendiente':'Confirmada'
-  });
-}
-
-async function regalarIngreso(id){
-  if(!isAdmin())return alert('Solo el administrador');
-
-  if(!confirm('¿Marcar esta pista como REGALADA? No contará como ingreso.'))return;
-
-  await actualizarIngreso(id,{
-    precio:0,
-    metodo_pago:'Regalada',
-    estado:'Regalada'
-  });
-}
-
-async function borrarIngreso(id){
-  if(!isAdmin())return alert('Solo el administrador');
-
-  if(!confirm('¿Borrar definitivamente esta reserva? Esta acción no se puede deshacer.'))return;
-
-  try{
-    const r=await fetch(
-      API+'?id=eq.'+encodeURIComponent(id),
-      {
-        method:'DELETE',
-        headers:headers()
-      }
-    );
-
-    if(!r.ok)throw Error(await r.text());
-
-    await cargarNube();
-    alert('Reserva borrada.');
-
-  }catch(e){
-    alert('No se pudo borrar la reserva.\n'+e.message);
-  }
-}
-
-async function actualizarIngreso(id,cambios){
-  try{
-    const r=await fetch(
-      API+'?id=eq.'+encodeURIComponent(id),
-      {
-        method:'PATCH',
-        headers:headers({
-          'Content-Type':'application/json',
-          'Prefer':'return=representation'
-        }),
-        body:JSON.stringify(cambios)
-      }
-    );
-
-    if(!r.ok)throw Error(await r.text());
-
-    await cargarNube();
-    alert('Reserva actualizada.');
-
-  }catch(e){
-    alert('No se pudo actualizar la reserva.\n'+e.message);
-  }
-}
-
-function saveConfig(){
-  if(!isAdmin()){
-    alert('Solo el administrador puede modificar la configuración.');
-    return;
-  }
-
-  const p=Number(document.getElementById('precioConfig').value);
-
-  if(!Number.isFinite(p)||p<0){
-    alert('Precio no válido.');
-    return;
-  }
-
-  data.price=p;
-  localStorage.setItem('padelPrice',String(p));
-
-  alert('Configuración guardada.');
-  render();
-}
-
-document.getElementById('mesIngreso').value=
-  new Date().toISOString().slice(0,7);
 
 render();
 cargarNube();
+
+setInterval(cargarNube,15000);
+}
+
+function isAdmin(){
+return sessionStorage.getItem('padelAdmin')==='1'
+}
+
+function adminLogin(){
+
+let p=prompt('PIN de administrador:');
+
+if(p===null)return;
+
+let saved=localStorage.getItem('padelPin')||'1234';
+
+if(p===saved){
+sessionStorage.setItem('padelAdmin','1');
+applyRole();
+alert('Administrador activado')
+}else{
+alert('PIN incorrecto')
+}
+}
+
+function logoutAdmin(){
+sessionStorage.removeItem('padelAdmin');
+applyRole();
+show('reservas')
+}
+
+function applyRole(){
+$$('.adminOnly').forEach(e=>e.style.display=isAdmin()?'':'none')
+}
+
+function $$(sel){
+return document.querySelectorAll(sel)
+}
+
+function show(id,b){
+
+$$('.page').forEach(x=>x.classList.add('hidden'));
+
+$(id).classList.remove('hidden');
+
+if(b){
+$$('.tabs button').forEach(x=>x.classList.remove('active'));
+b.classList.add('active')
+}
+
+render();
+}
+
+function setToday(){
+
+$('viewDate').value=new Date().toISOString().slice(0,10);
+
+renderSlots()
+}
+
+
+/* HORARIOS
+   Empiezan exactamente en la hora de apertura configurada.
+   Ejemplo: si Inicio = 11:00:
+   11:00, 12:30, 14:00, 15:30...
+*/
+
+function times(){
+
+let inicio=data.start||'09:00';
+let fin=data.end||'00:00';
+let dur=Number(data.duration)||90;
+
+let [h,m]=inicio.split(':').map(Number);
+let [eh,em]=fin.split(':').map(Number);
+
+if(!Number.isFinite(h)||!Number.isFinite(m)){
+h=9;
+m=0;
+}
+
+if(!Number.isFinite(eh)||!Number.isFinite(em)){
+eh=0;
+em=0;
+}
+
+let inicioMin=h*60+m;
+let finMin=eh*60+em;
+
+if(finMin===0){
+finMin=1440;
+}
+
+let horas=[];
+
+for(let actual=inicioMin;actual+dur<=finMin;actual+=dur){
+
+let hh=Math.floor(actual/60)%24;
+let mm=actual%60;
+
+horas.push(
+String(hh).padStart(2,'0')+':' +
+String(mm).padStart(2,'0')
+);
+}
+
+return horas;
+}
+
+function horaFin(t){
+
+let [h,m]=t.split(':').map(Number);
+let x=h*60+m+90;
+
+return String(Math.floor(x/60)%24).padStart(2,'0')+':' +
+String(x%60).padStart(2,'0');
+}
+
+function esc(v){
+
+return String(v??'').replace(
+/[&<>"']/g,
+m=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[m])
+);
+}
+
+function renderSlots(){
+
+let d=$('viewDate').value;
+
+let horas=times();
+
+$('slots').innerHTML=horas.map(t=>{
+
+let r=data.reservas.find(
+x=>String(x.fecha||'')===d &&
+String(x.hora_inicio||'').slice(0,5)===t &&
+String(x.estado||'')!=='Cancelada'
+);
+
+return r
+
+? `<div class="slot busy">
+<b>${t}</b><br>
+🔴 Ocupado<br>
+<span class="small">${esc(r.nombre||'')}</span><br>
+<button onclick="solicitarCancelacion('${esc(r.id)}','${esc(r.telefono||'')}')">
+Solicitar cancelación
+</button>
+${isAdmin()?`
+<br>
+<button class="danger" onclick="cancelar('${esc(r.id)}')">
+Cancelar
+</button>`:''}
+</div>`
+
+: `<div class="slot">
+<b>${t}</b><br>
+🟢 Disponible<br>
+<button onclick="reserveAt('${d}','${t}')">
+Reservar
+</button>
+</div>`;
+
+}).join('');
+
+let rs=data.reservas.filter(
+x=>String(x.fecha||'')===d &&
+String(x.estado||'')!=='Cancelada'
+);
+
+$('reservationList').innerHTML=rs.length
+
+? rs.map(r=>`
+
+<div class="card" style="margin:8px 0;padding:12px">
+
+<b>🕐 ${esc(String(r.hora_inicio||'').slice(0,5))}–${esc(String(r.hora_fin||'').slice(0,5))}</b>
+· ${esc(r.nombre||'')}<br>
+
+<span class="small">
+📞 ${esc(r.telefono||'')} ·
+💳 ${esc(r.metodo_pago||'Pendiente')} ·
+${esc(r.estado||'')}
+</span>
+
+<br>
+
+<button onclick="solicitarCancelacion('${esc(r.id)}','${esc(r.telefono||'')}')">
+Solicitar cancelación
+</button>
+
+${isAdmin()?`
+<br>
+<button class="danger" onclick="cancelar('${esc(r.id)}')">
+Cancelar
+</button>`:''}
+
+</div>
+
+`).join('')
+
+: 'No hay reservas para esta fecha.';
+
+$('durText').textContent=data.duration;
+$('priceText').textContent=Number(data.price).toFixed(2);
+}
+
+function reserveAt(d,t){
+
+$('date').value=d;
+
+show('nueva');
+
+render();
+
+$('time').value=t;
+}
+
+async function cargarNube(){
+
+try{
+
+let r=await fetch(
+API+'?select=*&order=fecha.asc,hora_inicio.asc',
+{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY
+}
+}
+);
+
+if(!r.ok)throw Error(await r.text());
+
+data.reservas=await r.json();
+
+localStorage.setItem(
+'padelReservas',
+JSON.stringify(data.reservas)
+);
+
+$('cloudStatus').textContent='🟢 Conectado a Supabase';
+$('cloudStatus').className='status ok';
+
+}catch(e){
+
+data.reservas=JSON.parse(
+localStorage.getItem('padelReservas')||'[]'
+);
+
+$('cloudStatus').textContent=
+'🟡 Supabase no responde; usando datos de este móvil';
+
+$('cloudStatus').className='status';
+}
+
+render();
+}
+
+async function createReservation(){
+
+let d=$('date').value;
+let t=$('time').value;
+let n=$('player').value.trim();
+
+if(!d||!t||!n)
+return alert('Completa fecha, hora y nombre');
+
+if(
+data.reservas.some(
+r=>String(r.fecha)===d &&
+String(r.hora_inicio||'').slice(0,5)===t &&
+String(r.estado||'')!=='Cancelada'
+)
+)
+return alert('Ese horario ya está ocupado');
+
+let r={
+fecha:d,
+hora_inicio:t,
+hora_fin:horaFin(t),
+nombre:n,
+telefono:$('phone').value.trim(),
+metodo_pago:$('pay').value,
+estado:'Pendiente'
+};
+
+try{
+
+let resp=await fetch(
+API,
+{
+method:'POST',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'return=representation'
+},
+body:JSON.stringify(r)
+}
+);
+
+if(!resp.ok)throw Error(await resp.text());
+
+alert('Reserva registrada');
+
+$('player').value='';
+$('phone').value='';
+
+await cargarNube();
+
+$('date').value=d;
+
+show('reservas');
+
+}catch(e){
+
+alert('No se pudo guardar la reserva.\n\n'+e.message)
+}
+}
+
+async function solicitarCancelacion(id,telefono){
+
+let p=prompt(
+'Introduce el teléfono usado en la reserva:'
+);
+
+if(p===null)return;
+
+const normalizar=s=>
+String(s||'').replace(/\D/g,'');
+
+if(
+normalizar(p)!==normalizar(telefono)
+)
+return alert(
+'El teléfono no coincide con la reserva.'
+);
+
+if(
+!confirm(
+'¿Solicitar la cancelación de esta reserva?'
+)
+)return;
+
+try{
+
+let r=await fetch(
+API+'?id=eq.'+encodeURIComponent(id),
+{
+method:'PATCH',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json'
+},
+body:JSON.stringify({
+estado:'Solicitud de cancelación'
+})
+}
+);
+
+if(!r.ok)throw Error(await r.text());
+
+alert('Solicitud enviada al administrador.');
+
+await cargarNube();
+
+}catch(e){
+
+alert(
+'No se pudo enviar la solicitud.\n'+e.message
+)
+}
+}
+
+async function cancelar(id){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+if(!confirm('¿Cancelar esta reserva?'))
+return;
+
+try{
+
+let r=await fetch(
+API+'?id=eq.'+encodeURIComponent(id),
+{
+method:'PATCH',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json'
+},
+body:JSON.stringify({
+estado:'Cancelada'
+})
+}
+);
+
+if(!r.ok)throw Error(await r.text());
+
+await cargarNube();
+
+}catch(e){
+
+alert(
+'No se pudo cancelar.\n'+e.message
+)
+}
+}
+
+async function editarIngreso(id){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+let r=data.reservas.find(
+x=>String(x.id)===String(id)
+);
+
+if(!r)
+return alert('Reserva no encontrada');
+
+let precio=prompt(
+'Importe de esta reserva (€):',
+String(r.precio ?? data.price)
+);
+
+if(precio===null)return;
+
+precio=Number(precio);
+
+if(!Number.isFinite(precio)||precio<0)
+return alert('Importe no válido');
+
+let pago=prompt(
+'Forma de pago (Efectivo, Tarjeta o Pendiente):',
+r.metodo_pago||'Pendiente'
+);
+
+if(pago===null)return;
+
+await actualizarIngreso(
+id,
+{
+precio:precio,
+metodo_pago:pago,
+estado:'Pendiente'===pago?'Pendiente':'Confirmada'
+}
+);
+}
+
+async function regalarIngreso(id){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+if(
+!confirm(
+'¿Marcar esta pista como REGALADA? No contará como ingreso.'
+)
+)return;
+
+await actualizarIngreso(
+id,
+{
+precio:0,
+metodo_pago:'Regalada',
+estado:'Regalada'
+}
+);
+}
+
+async function borrarIngreso(id){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+if(
+!confirm(
+'¿Borrar definitivamente esta reserva? Esta acción no se puede deshacer.'
+)
+)return;
+
+try{
+
+let r=await fetch(
+API+'?id=eq.'+encodeURIComponent(id),
+{
+method:'DELETE',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY
+}
+}
+);
+
+if(!r.ok)throw Error(await r.text());
+
+await cargarNube();
+
+alert('Reserva borrada.');
+
+}catch(e){
+
+alert(
+'No se pudo borrar la reserva.\n'+e.message
+)
+}
+}
+
+async function actualizarIngreso(id,cambios){
+
+try{
+
+let r=await fetch(
+API+'?id=eq.'+encodeURIComponent(id),
+{
+method:'PATCH',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json'
+},
+body:JSON.stringify(cambios)
+}
+);
+
+if(!r.ok)throw Error(await r.text());
+
+await cargarNube();
+
+alert('Reserva actualizada.');
+
+}catch(e){
+
+alert(
+'No se pudo actualizar la reserva.\n'+e.message
+)
+}
+}
+
+function renderIncome(){
+
+if(!isAdmin())return;
+
+let m=$('monthPick').value;
+
+let rs=data.reservas.filter(
+r=>String(r.fecha||'').startsWith(m) &&
+r.metodo_pago &&
+r.metodo_pago!=='Pendiente' &&
+r.metodo_pago!=='Regalada' &&
+String(r.estado||'')!=='Cancelada'
+);
+
+let total=rs.reduce(
+(a,r)=>a+Number(r.precio ?? data.price),
+0
+);
+
+$('total').textContent='€'+total.toFixed(2);
+
+$('count').textContent=
+rs.length+' reservas cobradas';
+
+$('incomeRows').innerHTML=
+rs.map(r=>`
+
+<tr>
+<td>${esc(r.fecha)}</td>
+<td>${esc(String(r.hora_inicio||'').slice(0,5))}</td>
+<td>${esc(r.nombre)}</td>
+<td>${esc(r.metodo_pago)}</td>
+<td>€${Number(r.precio ?? data.price).toFixed(2)}</td>
+
+<td>
+<button onclick="editarIngreso('${esc(r.id)}')">
+Editar
+</button>
+
+<button onclick="regalarIngreso('${esc(r.id)}')">
+Regalar
+</button>
+
+<button class="danger" onclick="borrarIngreso('${esc(r.id)}')">
+Borrar
+</button>
+</td>
+
+</tr>
+
+`).join('');
+}
+
+function saveConfig(){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+data.price=
+Number($('price').value)||12;
+
+data.duration=
+Number($('duration').value)||90;
+
+data.start=
+$('start').value||'09:00';
+
+data.end=
+$('end').value||'00:00';
+
+localStorage.setItem(
+'padelConfig',
+JSON.stringify(data)
+);
+
+render();
+
+alert('Configuración guardada en este móvil');
+}
+
+function render(){
+
+if(!data.start)
+data.start='09:00';
+
+if(!data.end)
+data.end='00:00';
+
+if(
+!Number(data.duration) ||
+Number(data.duration)<30
+)
+data.duration=90;
+
+$('price').value=data.price;
+$('duration').value=data.duration;
+$('start').value=data.start;
+$('end').value=data.end;
+
+const selector=$('time');
+
+const horas=times();
+
+selector.innerHTML=
+horas.map(
+t=>`<option value="${t}">${t}</option>`
+).join('');
+
+renderSlots();
+renderIncome();
+applyRole();
+}
+
+init();
+
 </script>
 
 </body>
