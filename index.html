@@ -4,10 +4,40 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pádel Beariz</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17221b}header{background:#123b2a;color:#fff;padding:18px}.wrap{max-width:980px;margin:auto;padding:16px}h1{margin:0 0 4px}.sub{opacity:.85}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}button{border:0;border-radius:10px;padding:11px 14px;background:#1e7a55;color:#fff;font-weight:700}button.active{background:#f2a900}.danger{background:#b3261e}.card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}.slot.busy{background:#ffe5e5;border-color:#f4b3b3}.small{font-size:13px;color:#68746d}.hidden{display:none}.status{padding:10px;border-radius:10px;background:#fff3cd}.ok{background:#dff4e7}.money{font-size:30px;font-weight:800}input,select{width:100%;padding:11px;border:1px solid #ccd5cf;border-radius:9px;margin:5px 0 10px}label{font-weight:700}.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}@media(max-width:600px){.wrap{padding:10px}.tabs button{flex:1 1 45%}table{font-size:13px}}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17221b}
+header{background:#123b2a;color:#fff;padding:18px}
+.wrap{max-width:980px;margin:auto;padding:16px}
+h1{margin:0 0 4px}
+.sub{opacity:.85}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+button{border:0;border-radius:10px;padding:11px 14px;background:#1e7a55;color:#fff;font-weight:700}
+button.active{background:#f2a900}
+.danger{background:#b3261e}
+.card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}
+.slot.busy{background:#ffe5e5;border-color:#f4b3b3}
+.small{font-size:13px;color:#68746d}
+.hidden{display:none}
+.status{padding:10px;border-radius:10px;background:#fff3cd}
+.ok{background:#dff4e7}
+.money{font-size:30px;font-weight:800}
+input,select{width:100%;padding:11px;border:1px solid #ccd5cf;border-radius:9px;margin:5px 0 10px}
+label{font-weight:700}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}
+th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
+@media(max-width:600px){
+.wrap{padding:10px}
+.tabs button{flex:1 1 45%}
+table{font-size:13px}
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -58,6 +88,7 @@ Cada reserva dura <span id="durText">90</span> minutos · Precio €<span id="pr
 
 </section>
 
+
 <section id="nueva" class="page hidden">
 
 <div class="card">
@@ -80,7 +111,9 @@ Nombre
 
 <label>
 Teléfono
-<input id="phone" inputmode="tel" placeholder="Teléfono"
+<input id="phone"
+       inputmode="tel"
+       placeholder="Teléfono"
        oninput="this.value=this.value.replace(/\s+/g,'')">
 </label>
 
@@ -96,23 +129,31 @@ Pago
 <button onclick="createReservation()">Reservar</button>
 
 </div>
+
 </section>
+
 
 <section id="ingresos" class="page hidden adminOnly">
 
 <div class="card">
+
 <label>
 Mes
 <input id="monthPick" type="month" onchange="renderIncome()">
 </label>
 
 <div class="money" id="total">€0.00</div>
+
 <div class="small" id="count">0 reservas cobradas</div>
+
 </div>
 
 <div class="card">
+
 <div style="overflow:auto">
+
 <table>
+
 <thead>
 <tr>
 <th>Fecha</th>
@@ -120,18 +161,25 @@ Mes
 <th>Jugador</th>
 <th>Pago</th>
 <th>Importe</th>
+<th>Estado</th>
 </tr>
 </thead>
+
 <tbody id="incomeRows"></tbody>
+
 </table>
+
 </div>
+
 </div>
 
 </section>
 
+
 <section id="config" class="page hidden adminOnly">
 
 <div class="card">
+
 <h2>⚙️ Configuración</h2>
 
 <label>
@@ -158,22 +206,33 @@ Fin
 
 </div>
 
+
 <div class="card">
+
 <h2>🔐 Contraseña de administrador</h2>
 
 <label>
 Contraseña actual
-<input id="oldPin" type="password" inputmode="numeric" autocomplete="current-password">
+<input id="oldPin"
+       type="password"
+       inputmode="numeric"
+       autocomplete="current-password">
 </label>
 
 <label>
 Nueva contraseña
-<input id="newPin" type="password" inputmode="numeric" autocomplete="new-password">
+<input id="newPin"
+       type="password"
+       inputmode="numeric"
+       autocomplete="new-password">
 </label>
 
 <label>
 Repetir nueva contraseña
-<input id="newPin2" type="password" inputmode="numeric" autocomplete="new-password">
+<input id="newPin2"
+       type="password"
+       inputmode="numeric"
+       autocomplete="new-password">
 </label>
 
 <div class="small">Usa entre 4 y 8 dígitos.</div>
@@ -182,15 +241,20 @@ Repetir nueva contraseña
 <button onclick="changePin()">Cambiar contraseña</button>
 
 </div>
+
 </section>
 
 </main>
 
+
 <script>
 
 const SUPABASE_URL='https://jppsqrbpjwulzapyvpim.supabase.co';
+
 const SUPABASE_KEY='sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23';
+
 const API=SUPABASE_URL+'/rest/v1/reservas';
+
 
 let data={
 reservas:[],
@@ -200,34 +264,51 @@ start:'09:00',
 end:'00:00'
 };
 
+
 const $=id=>document.getElementById(id);
+
 
 function init(){
 
 const today=new Date().toISOString().slice(0,10);
 
 $('viewDate').value=today;
+
 $('date').value=today;
+
 $('monthPick').value=today.slice(0,7);
+
 
 let cfg=JSON.parse(localStorage.getItem('padelConfig')||'null');
 
 if(cfg){
+
 data.price=Number(cfg.price)||12;
+
 data.duration=Number(cfg.duration)||90;
+
 data.start=cfg.start||'09:00';
+
 data.end=cfg.end||'00:00';
+
 }
 
+
 render();
+
 cargarNube();
 
 setInterval(cargarNube,15000);
+
 }
 
+
 function isAdmin(){
-return sessionStorage.getItem('padelAdmin')==='1';
+
+return sessionStorage.getItem('padelAdmin')==='1'
+
 }
+
 
 function adminLogin(){
 
@@ -238,19 +319,32 @@ if(p===null)return;
 let saved=localStorage.getItem('padelPin')||'1234';
 
 if(p===saved){
+
 sessionStorage.setItem('padelAdmin','1');
+
 applyRole();
+
 alert('Administrador activado');
+
 }else{
+
 alert('PIN incorrecto');
-}
+
 }
 
-function logoutAdmin(){
-sessionStorage.removeItem('padelAdmin');
-applyRole();
-show('reservas');
 }
+
+
+function logoutAdmin(){
+
+sessionStorage.removeItem('padelAdmin');
+
+applyRole();
+
+show('reservas');
+
+}
+
 
 function changePin(){
 
@@ -258,7 +352,9 @@ if(!isAdmin())
 return alert('Solo el administrador puede cambiar la contraseña.');
 
 let old=$('oldPin').value.trim();
+
 let np=$('newPin').value.trim();
+
 let np2=$('newPin2').value.trim();
 
 let saved=localStorage.getItem('padelPin')||'1234';
@@ -279,15 +375,25 @@ $('newPin').value='';
 $('newPin2').value='';
 
 alert('Contraseña cambiada correctamente.');
+
 }
+
 
 function applyRole(){
-$$('.adminOnly').forEach(e=>e.style.display=isAdmin()?'':'none');
+
+$$('.adminOnly').forEach(e=>
+e.style.display=isAdmin()?'':'none'
+);
+
 }
 
+
 function $$(sel){
+
 return document.querySelectorAll(sel);
+
 }
+
 
 function show(id,b){
 
@@ -296,35 +402,51 @@ $$('.page').forEach(x=>x.classList.add('hidden'));
 $(id).classList.remove('hidden');
 
 if(b){
+
 $$('.tabs button').forEach(x=>x.classList.remove('active'));
+
 b.classList.add('active');
+
 }
 
 render();
+
 }
 
+
 function setToday(){
+
 $('viewDate').value=new Date().toISOString().slice(0,10);
+
 renderSlots();
+
 }
+
 
 function times(){
 
 let inicio=data.start||'09:00';
+
 let fin=data.end||'00:00';
+
 let dur=Number(data.duration)||90;
 
 let [h,m]=inicio.split(':').map(Number);
+
 let [eh,em]=fin.split(':').map(Number);
 
 if(!Number.isFinite(h)||!Number.isFinite(m)){
+
 h=9;
 m=0;
+
 }
 
 if(!Number.isFinite(eh)||!Number.isFinite(em)){
+
 eh=0;
 em=0;
+
 }
 
 let limite=eh*60+em;
@@ -332,6 +454,7 @@ let limite=eh*60+em;
 if(limite===0)limite=1440;
 
 let cur=h*60+m;
+
 let out=[];
 
 while(cur+dur<=limite){
@@ -343,22 +466,29 @@ String(cur%60).padStart(2,'0')
 );
 
 cur+=dur;
+
 }
 
 return out;
+
 }
+
 
 function horaFin(t){
 
 let [h,m]=t.split(':').map(Number);
+
 let x=h*60+m+90;
 
 return String(Math.floor(x/60)%24).padStart(2,'0')+
 ':'+
 String(x%60).padStart(2,'0');
+
 }
 
+
 function esc(v){
+
 return String(v??'').replace(
 /[&<>"']/g,
 m=>({
@@ -369,64 +499,99 @@ m=>({
 "'":'&#39;'
 }[m])
 );
+
 }
+
 
 function renderSlots(){
 
 let d=$('viewDate').value;
+
 let horas=times();
 
 $('slots').innerHTML=horas.map(t=>{
 
-let r=data.reservas.find(
-x=>
-String(x.fecha||'')===d&&
-String(x.hora_inicio||'').slice(0,5)===t&&
+let r=data.reservas.find(x=>
+String(x.fecha||'')===d &&
+String(x.hora_inicio||'').slice(0,5)===t &&
 String(x.estado||'')!=='Cancelada'
 );
 
 return r
 
-? `<div class="slot busy">
+?
+
+`<div class="slot busy">
+
 <b>${t}</b><br>
+
 🔴 Ocupado<br>
-<span class="small">${esc(r.nombre||'')}</span><br>
-<button onclick="solicitarCancelacion('${esc(r.fecha)}','${esc(String(r.hora_inicio||'').slice(0,5))}','${esc(r.nombre||'')}')">
+
+<span class="small">
+${esc(r.nombre||'')}
+</span>
+
+<br>
+
+<button onclick="solicitarCancelacion(
+'${esc(r.fecha)}',
+'${esc(String(r.hora_inicio||'').slice(0,5))}',
+'${esc(r.nombre||'')}'
+)">
 Solicitar cancelación
 </button>
-${isAdmin()?`
-<br>
-<button class="danger" onclick="cancelar('${esc(r.fecha)}','${esc(String(r.hora_inicio||'').slice(0,5))}')">
+
+${isAdmin()?
+`<br>
+<button class="danger"
+onclick="cancelar(
+'${esc(r.fecha)}',
+'${esc(String(r.hora_inicio||'').slice(0,5))}'
+)">
 Cancelar
-</button>`:''}
+</button>`
+:''}
+
 </div>`
 
-: `<div class="slot">
+:
+
+`<div class="slot">
+
 <b>${t}</b><br>
+
 🟢 Disponible<br>
-<button onclick="reserveAt('${d}','${t}')">Reservar</button>
+
+<button onclick="reserveAt('${d}','${t}')">
+Reservar
+</button>
+
 </div>`;
 
 }).join('');
 
-let rs=data.reservas.filter(
-x=>
-String(x.fecha||'')===d&&
+
+let rs=data.reservas.filter(x=>
+String(x.fecha||'')===d &&
 String(x.estado||'')!=='Cancelada'
 );
 
-$('reservationList').innerHTML=rs.length
 
-? rs.map(r=>`
+$('reservationList').innerHTML=rs.length?
+
+rs.map(r=>`
 
 <div class="card" style="margin:8px 0;padding:12px">
 
 <b>
-🕐 ${esc(String(r.hora_inicio||'').slice(0,5))}–
+🕐 ${esc(String(r.hora_inicio||'').slice(0,5))}
+–
 ${esc(String(r.hora_fin||'').slice(0,5))}
 </b>
 
-· ${esc(r.nombre||'')}<br>
+· ${esc(r.nombre||'')}
+
+<br>
 
 <span class="small">
 📞 ${esc(String(r.telefono||'').replace(/\s+/g,''))}
@@ -444,25 +609,32 @@ ${esc(String(r.hora_fin||'').slice(0,5))}
 Solicitar cancelación
 </button>
 
-${isAdmin()?`
-<br>
+${isAdmin()?
+`<br>
 <button class="danger"
 onclick="cancelar(
 '${esc(r.fecha)}',
 '${esc(String(r.hora_inicio||'').slice(0,5))}'
 )">
 Cancelar
-</button>`:''}
+</button>`
+:''}
 
 </div>
 
 `).join('')
 
-: 'No hay reservas para esta fecha.';
+:
+
+'No hay reservas para esta fecha.';
+
 
 $('durText').textContent=data.duration;
+
 $('priceText').textContent=Number(data.price).toFixed(2);
+
 }
+
 
 function reserveAt(d,t){
 
@@ -473,7 +645,9 @@ $('time').value=t;
 show('nueva');
 
 $('time').value=t;
+
 }
+
 
 async function cargarNube(){
 
@@ -500,6 +674,7 @@ JSON.stringify(data.reservas)
 );
 
 $('cloudStatus').textContent='🟢 Conectado a Supabase';
+
 $('cloudStatus').className='status ok';
 
 }catch(e){
@@ -512,31 +687,37 @@ $('cloudStatus').textContent=
 '🟡 Supabase no responde; usando datos de este móvil';
 
 $('cloudStatus').className='status';
+
 }
 
 render();
+
 }
+
 
 async function createReservation(){
 
 let d=$('date').value;
+
 let t=$('time').value;
+
 let n=$('player').value.trim();
 
 if(!d||!t||!n)
 return alert('Completa fecha, hora y nombre');
 
-if(
-data.reservas.some(
-r=>
-String(r.fecha)===d&&
-String(r.hora_inicio||'').slice(0,5)===t&&
+
+if(data.reservas.some(r=>
+String(r.fecha)===d &&
+String(r.hora_inicio||'').slice(0,5)===t &&
 String(r.estado||'')!=='Cancelada'
-)
-)
+))
+
 return alert('Ese horario ya está ocupado');
 
+
 let telefono=$('phone').value.replace(/\s+/g,'');
+
 
 let r={
 fecha:d,
@@ -548,35 +729,46 @@ metodo_pago:$('pay').value,
 estado:'Pendiente'
 };
 
+
 try{
 
 let resp=await fetch(
 API,
 {
 method:'POST',
+
 headers:{
 apikey:SUPABASE_KEY,
 Authorization:'Bearer '+SUPABASE_KEY,
 'Content-Type':'application/json',
 Prefer:'return=representation'
 },
+
 body:JSON.stringify(r)
+
 }
 );
+
 
 if(!resp.ok)
 throw Error(await resp.text());
 
+
 alert('Reserva registrada');
 
+
 $('player').value='';
+
 $('phone').value='';
 
+
 await cargarNube();
+
 
 $('date').value=d;
 
 show('reservas');
+
 
 }catch(e){
 
@@ -585,7 +777,9 @@ alert(
 );
 
 }
+
 }
+
 
 async function solicitarCancelacion(fecha,hora,nombre){
 
@@ -602,7 +796,9 @@ hora+
 if(motivo===null)return;
 
 alert('Solicitud enviada al administrador.');
+
 }
+
 
 async function cancelar(id){
 
@@ -618,14 +814,17 @@ let r=await fetch(
 API+'?id=eq.'+encodeURIComponent(id),
 {
 method:'PATCH',
+
 headers:{
 apikey:SUPABASE_KEY,
 Authorization:'Bearer '+SUPABASE_KEY,
 'Content-Type':'application/json'
 },
+
 body:JSON.stringify({
 estado:'Cancelada'
 })
+
 }
 );
 
@@ -641,7 +840,64 @@ alert(
 );
 
 }
+
 }
+
+
+/* =====================================================
+   NUEVO: MARCAR RESERVA COMO PAGADA
+   No necesita una columna nueva en Supabase.
+   Utiliza el campo "estado" que ya existe.
+   ===================================================== */
+
+async function marcarPagada(id){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+
+if(!confirm('¿Confirmar que esta reserva ya está pagada?'))
+return;
+
+
+try{
+
+let r=await fetch(
+API+'?id=eq.'+encodeURIComponent(id),
+{
+method:'PATCH',
+
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'return=representation'
+},
+
+body:JSON.stringify({
+estado:'Pagada'
+})
+
+}
+);
+
+
+if(!r.ok)
+throw Error(await r.text());
+
+
+await cargarNube();
+
+}catch(e){
+
+alert(
+'No se pudo marcar como pagada.\n'+e.message
+);
+
+}
+
+}
+
 
 function renderIncome(){
 
@@ -649,53 +905,118 @@ if(!isAdmin())return;
 
 let m=$('monthPick').value;
 
-let rs=data.reservas.filter(
-r=>
-String(r.fecha||'').startsWith(m)&&
-r.metodo_pago&&
-r.metodo_pago!=='Pendiente'&&
+
+/*
+Se muestran todas las reservas del mes
+excepto las canceladas.
+*/
+
+let rs=data.reservas.filter(r=>
+String(r.fecha||'').startsWith(m) &&
 String(r.estado||'')!=='Cancelada'
 );
 
-let total=rs.length*Number(data.price);
 
-$('total').textContent='€'+total.toFixed(2);
+/*
+Solo las que el administrador haya marcado
+como "Pagada" cuentan para el total.
+*/
+
+let pagadas=rs.filter(r=>
+String(r.estado||'')==='Pagada'
+);
+
+
+let total=pagadas.length*Number(data.price);
+
+
+$('total').textContent=
+'€'+total.toFixed(2);
+
 
 $('count').textContent=
-rs.length+' reservas cobradas';
+pagadas.length+
+' reservas cobradas';
 
-$('incomeRows').innerHTML=
-rs.map(
-r=>
-`<tr>
+
+$('incomeRows').innerHTML=rs.map(r=>{
+
+let pagada=
+String(r.estado||'')==='Pagada';
+
+
+return `
+
+<tr>
+
 <td>${esc(r.fecha)}</td>
-<td>${esc(String(r.hora_inicio||'').slice(0,5))}</td>
+
+<td>
+${esc(String(r.hora_inicio||'').slice(0,5))}
+</td>
+
 <td>${esc(r.nombre)}</td>
-<td>${esc(r.metodo_pago)}</td>
-<td>€${Number(data.price).toFixed(2)}</td>
-</tr>`
-).join('');
+
+<td>${esc(r.metodo_pago||'Pendiente')}</td>
+
+<td>
+€${Number(data.price).toFixed(2)}
+</td>
+
+<td>
+
+${
+pagada
+
+?
+
+`<span>✅ Pagada</span>`
+
+:
+
+`<button onclick="marcarPagada('${esc(r.id)}')">
+💶 Marcar pagada
+</button>`
 }
+
+</td>
+
+</tr>
+
+`;
+
+}).join('');
+
+}
+
 
 function saveConfig(){
 
 if(!isAdmin())
 return alert('Solo el administrador');
 
+
 data.price=Number($('price').value)||12;
+
 data.duration=Number($('duration').value)||90;
+
 data.start=$('start').value||'09:00';
+
 data.end=$('end').value||'00:00';
+
 
 localStorage.setItem(
 'padelConfig',
 JSON.stringify(data)
 );
 
+
 render();
 
 alert('Configuración guardada en este móvil');
+
 }
+
 
 function render(){
 
@@ -708,35 +1029,52 @@ data.end='00:00';
 if(!Number(data.duration)||Number(data.duration)<30)
 data.duration=90;
 
+
 $('price').value=data.price;
+
 $('duration').value=data.duration;
+
 $('start').value=data.start;
+
 $('end').value=data.end;
 
-/* CORRECCIÓN:
-   conservar la hora seleccionada antes de reconstruir
-   el selector. Así Efectivo/Tarjeta no vuelve a 09:00. */
+
+/*
+Conserva la hora elegida cuando render()
+vuelve a reconstruir el selector.
+*/
 
 const selector=$('time');
+
 const horaActual=selector.value;
+
 const horas=times();
 
 selector.innerHTML=
-horas.map(
-t=>`<option value="${t}">${t}</option>`
+horas.map(t=>
+`<option value="${t}">${t}</option>`
 ).join('');
 
+
 if(horaActual && horas.includes(horaActual)){
+
 selector.value=horaActual;
+
 }
 
+
 renderSlots();
+
 renderIncome();
+
 applyRole();
+
 }
+
 
 init();
 
 </script>
+
 </body>
 </html>
