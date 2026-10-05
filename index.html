@@ -206,8 +206,22 @@ Mes
 
 <label>
 Precio (€)
-<input id="price" type="number" step="0.50">
+<input id="price" type="number" min="0" step="0.50">
 </label>
+<div class="small">Pon 0 para que la pista sea gratis.</div>
+
+<hr style="border:0;border-top:1px solid #eee;margin:16px 0">
+
+<h3>🔐 Contraseña de administrador</h3>
+<label>
+Nueva contraseña / PIN
+<input id="newAdminPin" type="password" inputmode="numeric" placeholder="Nueva contraseña">
+</label>
+<label>
+Repetir contraseña / PIN
+<input id="newAdminPin2" type="password" inputmode="numeric" placeholder="Repetir contraseña">
+</label>
+<button onclick="cambiarPin()">Cambiar contraseña</button>
 
 <label>
 Duración (minutos)
@@ -326,6 +340,33 @@ sessionStorage.removeItem('padelAdmin');
 applyRole();
 
 show('reservas');
+
+}
+
+
+function cambiarPin(){
+
+if(!isAdmin())
+return alert('Solo el administrador');
+
+const p=$('newAdminPin').value.trim();
+const p2=$('newAdminPin2').value.trim();
+
+if(!p)
+return alert('Escribe la nueva contraseña.');
+
+if(p!==p2)
+return alert('Las contraseñas no coinciden.');
+
+if(p.length<4)
+return alert('La contraseña debe tener al menos 4 caracteres.');
+
+localStorage.setItem('padelPin',p);
+
+$('newAdminPin').value='';
+$('newAdminPin2').value='';
+
+alert('Contraseña de administrador cambiada correctamente.');
 
 }
 
@@ -924,6 +965,8 @@ telefono:$('phone').value.trim(),
 
 metodo_pago:$('pay').value,
 
+precio:data.price,
+
 estado:'Pendiente'
 
 };
@@ -1386,9 +1429,12 @@ return alert(
 'Solo el administrador'
 );
 
+const precio=Number($('price').value);
 
-data.price=
-Number($('price').value)||12;
+if(!Number.isFinite(precio)||precio<0)
+return alert('El precio no puede ser negativo.');
+
+data.price=precio;
 
 
 data.duration=
