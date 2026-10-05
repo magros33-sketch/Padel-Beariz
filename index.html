@@ -85,7 +85,7 @@ Fecha
 
 <div class="small">
 Cada reserva dura <span id="durText">90</span> minutos ·
-Precio €<span id="priceText">12</span>
+Precio <span id="priceText">€12</span>
 </div>
 
 <div id="slots" class="grid"></div>
@@ -735,7 +735,9 @@ Cancelar
 $('durText').textContent=data.duration;
 
 $('priceText').textContent=
-Number(data.price).toFixed(2);
+Number(data.price)===0
+?'GRATIS'
+:'€'+Number(data.price).toFixed(2);
 
 }
 
