@@ -255,6 +255,8 @@ let cfg=JSON.parse(
 localStorage.getItem('padelConfig')||'null'
 );
 
+cargarConfiguracionGlobal();
+
 if(cfg){
 
 data.price=Number.isFinite(Number(cfg.price)) ? Number(cfg.price) : 12;
@@ -333,6 +335,20 @@ return alert('Las contraseñas no coinciden.');
 
 if(p.length<4)
 return alert('La contraseña debe tener al menos 4 caracteres.');
+
+const r=await fetch(SUPABASE_URL+'/rest/v1/configuracion?id=eq.1',{
+method:'PATCH',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'return=minimal'
+},
+body:JSON.stringify({admin_pin:p})
+});
+
+if(!r.ok)
+return alert('No se pudo guardar la nueva contraseña en Supabase.\\n\\n'+await r.text());
 
 localStorage.setItem('padelPin',p);
 
@@ -823,6 +839,38 @@ $('date').addEventListener(
 ()=>actualizarHorariosNueva()
 );
 
+
+async function cargarConfiguracionGlobal(){
+  try{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/configuracion?id=eq.1&select=admin_pin');
+    if(!r.ok)return;
+    const rows=await r.json();
+    const c=rows&&rows[0];
+    if(!c)return;
+
+    const localPin=localStorage.getItem('padelPin')||'1234';
+
+    if(typeof c.admin_pin==='string' && c.admin_pin){
+      if(c.admin_pin==='1234' && localPin!=='1234'){
+        const sync=await fetch(SUPABASE_URL+'/rest/v1/configuracion?id=eq.1',{
+          method:'PATCH',
+          headers:{
+            apikey:SUPABASE_KEY,
+            Authorization:'Bearer '+SUPABASE_KEY,
+            'Content-Type':'application/json',
+            Prefer:'return=minimal'
+          },
+          body:JSON.stringify({admin_pin:localPin})
+        });
+        if(sync.ok){
+          localStorage.setItem('padelPin',localPin);
+          return;
+        }
+      }
+      localStorage.setItem('padelPin',c.admin_pin);
+    }
+  }catch(_){}
+}
 
 async function cargarNube(){
 
