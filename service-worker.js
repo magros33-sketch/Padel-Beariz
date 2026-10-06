@@ -11,6 +11,12 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const req = event.request;
+
+  if (req.url === "https://beariz.org/wp-content/downloads/escudo/beariz-seal.svg") {
+    event.respondWith(fetch("https://www.bandomovil.com/img_web/logo/beariz.png"));
+    return;
+  }
+
   if (req.mode !== "navigate") return;
 
   event.respondWith((async () => {
