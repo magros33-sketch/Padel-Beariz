@@ -2,7 +2,7 @@ const CONFIG_URL = "https://jppsqrbpjwulzapyvpim.supabase.co/rest/v1/configuraci
 const SUPABASE_KEY = "sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23";
 
 self.addEventListener("install", event => {
-  self.skipWaiting();
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", event => {
@@ -14,10 +14,17 @@ self.addEventListener("fetch", event => {
   if (req.mode !== "navigate") return;
 
   event.respondWith((async () => {
-    const response = await fetch(req);
+    let response;
+    try {
+      response = await fetch(req);
+    } catch (_) {
+      return fetch(req);
+    }
+
     try {
       const type = response.headers.get("content-type") || "";
       if (!type.includes("text/html")) return response;
+
       let html = await response.text();
       const injected = `<script>
 (async function(){
@@ -48,8 +55,11 @@ self.addEventListener("fetch", event => {
   }catch(e){}
 })();
 </script>`;
-      html = html.replace("</body>", injected + "</body>");
-      return new Response(html, {status: response.status, statusText: response.statusText, headers: response.headers});
+
+      html = html.replace(/<\/body>/i, injected + "</body>");
+      const headers = new Headers();
+      headers.set("content-type", "text/html; charset=utf-8");
+      return new Response(html, {status: response.status, statusText: response.statusText, headers});
     } catch (_) {
       return response;
     }
