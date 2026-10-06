@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><image href="https://beariz.org/wp-content/downloads/escudo/beariz-seal.svg?v=2" x="0" y="0" width="512" height="512" preserveAspectRatio="xMidYMid meet"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="96" fill="#123b2a"/>
+<circle cx="256" cy="150" r="82" fill="#fff"/>
+<path d="M210 88c28 18 48 48 48 78s-20 60-48 78" fill="none" stroke="#123b2a" stroke-width="10" stroke-linecap="round"/>
+<path d="M302 88c-28 18-48 48-48 78s20 60 48 78" fill="none" stroke="#123b2a" stroke-width="10" stroke-linecap="round"/>
+<text x="256" y="300" text-anchor="middle" font-family="Arial,sans-serif" font-size="54" font-weight="800" fill="#fff">PÁDEL</text>
+<text x="256" y="365" text-anchor="middle" font-family="Arial,sans-serif" font-size="62" font-weight="900" letter-spacing="3" fill="#fff">BEARIZ</text>
+</svg>
