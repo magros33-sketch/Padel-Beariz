@@ -1544,12 +1544,30 @@ JSON.stringify(data)
 );
 
 
+fetch(SUPABASE_URL+'/rest/v1/configuracion?id=eq.1',{
+method:'PATCH',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'return=minimal'
+},
+body:JSON.stringify({
+precio_reserva:data.price,
+duracion_minutos:data.duration,
+hora_apertura:data.start,
+hora_cierre:data.end
+})
+})
+.then(async r=>{
+if(!r.ok)throw Error(await r.text());
 render();
-
-
-alert(
-'Configuración guardada en este móvil'
-);
+alert('Configuración guardada correctamente para todos los dispositivos');
+})
+.catch(e=>{
+render();
+alert('No se pudo guardar la configuración en Supabase.\\n\\n'+e.message);
+});
 
 }
 
