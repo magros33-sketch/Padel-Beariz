@@ -243,7 +243,6 @@ const today=new Date().toISOString().slice(0,10);
 
 $('viewDate').value=today;
 $('date').value=today;
-$('monthPick').value=today.slice(0,7);
 
 let cfg=JSON.parse(
 localStorage.getItem('padelConfig')||'null'
