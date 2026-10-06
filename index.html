@@ -29,6 +29,8 @@ button.active{background:#f2a900}
 .hidden{display:none}
 .status{padding:10px;border-radius:10px;background:#fff3cd}
 .ok{background:#dff4e7}
+.cancelNotice{display:none;margin:12px 0;padding:14px 16px;border:3px solid #e5a900;border-radius:14px;background:#fff0c2;color:#4a3500;font-weight:800}
+.cancelNotice button{margin-top:8px;background:#b3261e}
 .money{font-size:30px;font-weight:800}
 input,select{width:100%;padding:11px;border:1px solid #ccd5cf;border-radius:9px;margin:5px 0 10px}
 label{font-weight:700}
@@ -56,6 +58,8 @@ table{font-size:13px}
 <main class="wrap">
 
 <div id="cloudStatus" class="status">🟡 Conectando…</div>
+
+<div id="cancelNotice" class="cancelNotice"></div>
 
 <div class="tabs">
 <button class="active" onclick="show('reservas',this)">📅 Reservas</button>
@@ -1399,6 +1403,49 @@ pagada
 
 
 /* AVISO AL ADMINISTRADOR CUANDO APARECE UNA NUEVA SOLICITUD */
+function renderCancelNotice(reservas=data.reservas){
+  const aviso=$('cancelNotice');
+  if(!aviso) return;
+
+  if(!isAdmin()){
+    aviso.style.display='none';
+    aviso.innerHTML='';
+    return;
+  }
+
+  const pendientes=reservas.filter(r=>
+    String(r.estado||'').includes('Solicitud de cancelación')
+  );
+
+  if(!pendientes.length){
+    aviso.style.display='none';
+    aviso.innerHTML='';
+    return;
+  }
+
+  aviso.style.display='block';
+
+  const lista=pendientes.map(r=>{
+    const nombre=esc(r.nombre||'Reserva');
+    const fecha=esc(r.fecha||'');
+    const hora=esc(String(r.hora_inicio||'').slice(0,5));
+    return '• '+nombre+' · '+fecha+' · '+hora;
+  }).join('<br>');
+
+  aviso.innerHTML=
+    '🔔 HAY '+pendientes.length+
+    ' SOLICITUD'+(pendientes.length===1?'':'ES')+
+    ' DE CANCELACIÓN'+
+    '<br><span class="small">'+lista+'</span>'+
+    '<br><button onclick="verSolicitudesCancelacion()">Ver solicitudes</button>';
+}
+
+function verSolicitudesCancelacion(){
+  show('reservas');
+  const aviso=$('cancelNotice');
+  if(aviso) aviso.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 function notificarCancelacionesNuevas(reservas){
   if(!isAdmin()) return;
 
@@ -1427,24 +1474,12 @@ function notificarCancelacionesNuevas(reservas){
           });
         }catch(_){}
       }
-
-      const aviso=$('cloudStatus');
-      if(aviso){
-        aviso.textContent='🔔 '+mensaje;
-        aviso.className='status warning';
-        setTimeout(()=>{
-          if($('cloudStatus')){
-            $('cloudStatus').textContent='🟢 Conectado a Supabase';
-            $('cloudStatus').className='status ok';
-          }
-        },8000);
-      }
     }
   });
 
   localStorage.setItem(clave,JSON.stringify(actual));
+  renderCancelNotice(reservas);
 }
-
 
 /* AVISOS PUSH DE CANCELACIÓN */
 
@@ -1605,6 +1640,8 @@ $('end').value=data.end;
 
 
 renderSlots();
+
+renderCancelNotice(data.reservas);
 
 
 /*
