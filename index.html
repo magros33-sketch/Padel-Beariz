@@ -1298,7 +1298,10 @@ function renderIncome(){
 if(!isAdmin())return;
 
 
-let m=$('monthPick').value;
+const monthPick=$('monthPick');
+if(!monthPick)return;
+
+let m=monthPick.value;
 
 
 let rs=data.reservas.filter(r=>
