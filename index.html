@@ -242,6 +242,13 @@ Fin
 Guardar configuración
 </button>
 
+<hr style="border:0;border-top:1px solid #eee;margin:16px 0">
+
+<h3>📱 Avisos de cancelación</h3>
+<div class="small">Activa los avisos en este teléfono. Solo el dispositivo activado recibirá las solicitudes.</div>
+<button onclick="activarAvisosCancelacion()">🔔 Activar avisos en este teléfono</button>
+<div id="pushStatus" class="small" style="margin-top:8px"></div>
+
 </div>
 
 </section>
@@ -271,6 +278,10 @@ const $=id=>document.getElementById(id);
 
 
 function init(){
+
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+}
 
 const today=new Date().toISOString().slice(0,10);
 
@@ -1419,6 +1430,72 @@ pagada
 
 }).join('');
 
+}
+
+
+/* AVISOS PUSH DE CANCELACIÓN */
+
+const VAPID_PUBLIC_KEY='BPnAfPiTc5AC+DKYKLiRKST8gAhniQ8hWbdDYb4LbCYLeTYdJ1Odw+kH/lqan9PdnFWbuba+aaYQvh4EgdRBVxY=';
+
+function urlBase64ToUint8Array(base64String){
+const padding='='.repeat((4-base64String.length%4)%4);
+const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+const raw=atob(base64);
+return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+
+async function activarAvisosCancelacion(){
+if(!isAdmin())
+return alert('Solo el administrador');
+
+if(!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window))
+return alert('Este teléfono o navegador no admite avisos push.');
+
+try{
+const permiso=Notification.permission==='granted'
+?'granted'
+:await Notification.requestPermission();
+
+if(permiso!=='granted')
+return alert('No se concedió permiso para las notificaciones.');
+
+const reg=await navigator.serviceWorker.ready;
+let sub=await reg.pushManager.getSubscription();
+
+if(!sub){
+sub=await reg.pushManager.subscribe({
+userVisibleOnly:true,
+applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+});
+}
+
+const datos=sub.toJSON();
+
+const resp=await fetch(SUPABASE_URL+'/rest/v1/padel_push_subscriptions?on_conflict=endpoint',{
+method:'POST',
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY,
+'Content-Type':'application/json',
+Prefer:'resolution=merge-duplicates,return=minimal'
+},
+body:JSON.stringify({
+endpoint:datos.endpoint,
+p256dh:datos.keys?.p256dh,
+auth:datos.keys?.auth
+})
+});
+
+if(!resp.ok)
+throw Error(await resp.text());
+
+$('pushStatus').textContent='🟢 Avisos activados en este teléfono.';
+alert('Avisos de cancelación activados en este teléfono.');
+
+}catch(e){
+$('pushStatus').textContent='🔴 No se pudieron activar los avisos.';
+alert('No se pudieron activar los avisos.\n\n'+e.message);
+}
 }
 
 
