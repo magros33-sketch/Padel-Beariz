@@ -886,7 +886,11 @@ if(!r.ok)
 throw Error(await r.text());
 
 
-data.reservas=await r.json();
+const nuevasReservas=await r.json();
+
+notificarCancelacionesNuevas(nuevasReservas);
+
+data.reservas=nuevasReservas;
 
 
 localStorage.setItem(
@@ -1430,6 +1434,54 @@ pagada
 
 }).join('');
 
+}
+
+
+/* AVISO AL ADMINISTRADOR CUANDO APARECE UNA NUEVA SOLICITUD */
+function notificarCancelacionesNuevas(reservas){
+  if(!isAdmin()) return;
+
+  const clave='padelCancelacionesAvisadas';
+  const anterior=JSON.parse(localStorage.getItem(clave)||'{}');
+  const actual={};
+
+  reservas.forEach(r=>{
+    const estado=String(r.estado||'');
+    if(!estado.includes('Solicitud de cancelación')) return;
+
+    const id=String(r.id);
+    actual[id]=estado;
+
+    if(anterior[id]!==estado){
+      const nombre=String(r.nombre||'Reserva');
+      const hora=String(r.hora_inicio||'').slice(0,5);
+      const mensaje='Solicitud de cancelación: '+nombre+(hora?' · '+hora:'');
+
+      if('Notification' in window && Notification.permission==='granted'){
+        try{
+          new Notification('🎾 Pádel Beariz',{
+            body:mensaje,
+            tag:'cancelacion-'+id,
+            renotify:true
+          });
+        }catch(_){}
+      }
+
+      const aviso=$('cloudStatus');
+      if(aviso){
+        aviso.textContent='🔔 '+mensaje;
+        aviso.className='status warning';
+        setTimeout(()=>{
+          if($('cloudStatus')){
+            $('cloudStatus').textContent='🟢 Conectado a Supabase';
+            $('cloudStatus').className='status ok';
+          }
+        },8000);
+      }
+    }
+  });
+
+  localStorage.setItem(clave,JSON.stringify(actual));
 }
 
 
