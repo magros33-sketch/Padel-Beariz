@@ -1,0 +1,10 @@
+{
+  "name":"Pádel Beariz",
+  "short_name":"Pádel Beariz",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#123b2a",
+  "theme_color":"#123b2a",
+  "lang":"es",
+  "icons":[{"src":"https://beariz.org/wp-content/downloads/escudo/beariz-seal.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
