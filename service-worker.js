@@ -1,4 +1,4 @@
-const CONFIG_URL = "https://jppsqrbpjwulzapyvpim.supabase.co/rest/v1/configuracion?id=eq.1&select=precio_reserva,duracion_minutos,hora_apertura,hora_cierre,admin_pin";
+const CONFIG_URL = "https://jppsqrbpjwulzapyvpim.supabase.co/rest/v1/configuracion?id=eq.1&select=precio_reserva,duracion_minutos,hora_apertura,hora_cierre";
 const SUPABASE_KEY = "sb_publishable_M_k6UDXHwXZ7lvMSYQWp2w_iOEUIa23";
 
 self.addEventListener("install", event => {
@@ -40,7 +40,6 @@ self.addEventListener("fetch", event => {
     if(Number.isFinite(Number(c.duracion_minutos)))cfg.duration=Number(c.duracion_minutos);
     if(c.hora_apertura)cfg.start=String(c.hora_apertura).slice(0,5);
     if(c.hora_cierre)cfg.end=String(c.hora_cierre).slice(0,5);
-    if(typeof c.admin_pin==='string' && c.admin_pin) localStorage.setItem('padelPin',c.admin_pin);
     localStorage.setItem('padelConfig',JSON.stringify(cfg));
     if(typeof data!=='undefined'){
       data.price=cfg.price;
