@@ -285,7 +285,7 @@ localStorage.getItem('padelConfig')||'null'
 
 if(cfg){
 
-data.price=Number(cfg.price)||12;
+data.price=Number.isFinite(Number(cfg.price)) ? Number(cfg.price) : 12;
 data.duration=Number(cfg.duration)||90;
 data.start=cfg.start||'09:00';
 data.end=cfg.end||'00:00';
