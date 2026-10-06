@@ -5,8 +5,6 @@ self.addEventListener("push", event => {
   const title = data.title || "🎾 Pádel Beariz";
   const options = {
     body: data.body || "Nueva solicitud de cancelación.",
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
     vibrate: [200, 100, 200],
     data: { url: data.url || "/" },
     tag: "padel-cancelacion",
