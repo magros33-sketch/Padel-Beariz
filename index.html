@@ -72,6 +72,7 @@ table{font-size:13px}
 <button class="active" onclick="show('reservas',this)">📅 Reservas</button>
 <button onclick="show('nueva',this)">➕ Nueva</button>
 <button class="adminOnly" onclick="show('config',this)">⚙️ Configuración</button>
+<button class="adminOnly" onclick="show('ingresos',this)">💰 Ganancias</button>
 <button onclick="adminLogin()">🔐 Admin</button>
 <button onclick="show('reservas')">🏠 Inicio</button>
 <button class="adminOnly" onclick="logoutAdmin()">Salir</button>
@@ -116,6 +117,25 @@ No hay reservas para esta fecha.
 
 </div>
 
+</section>
+
+<section id="ingresos" class="page hidden adminOnly">
+<div class="card">
+<h2>💰 Ganancias / Ingresos</h2>
+<div class="row">
+<label>Mes
+<input id="monthPick" type="month" onchange="renderIncome()">
+</label>
+</div>
+<div class="money" id="total">€0.00</div>
+<div class="small" id="count">0 reservas cobradas</div>
+<div style="overflow:auto;margin-top:12px">
+<table>
+<thead><tr><th>Fecha</th><th>Hora</th><th>Quién pagó</th><th>Pago</th><th>Importe</th><th>Estado</th></tr></thead>
+<tbody id="incomeRows"></tbody>
+</table>
+</div>
+</div>
 </section>
 
 
@@ -261,6 +281,11 @@ $('date').value=today;
 let cfg=JSON.parse(
 localStorage.getItem('padelConfig')||'null'
 );
+
+if($('monthPick')){
+  const now=new Date();
+  $('monthPick').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+}
 
 const localPin=localStorage.getItem('padelPin');
 if(localPin && localPin!=='1234' && localStorage.getItem('padelPinSincronizado')!=='1'){
@@ -1016,7 +1041,7 @@ metodo_pago:$('pay').value,
 
 precio:data.price,
 
-estado:'Pendiente'
+estado:Number(data.price)===0?'Gratis':'Pendiente'
 
 };
 
@@ -1374,99 +1399,52 @@ function renderIncome(){
 
 if(!isAdmin())return;
 
-
 const monthPick=$('monthPick');
 if(!monthPick)return;
 
 let m=monthPick.value;
 
-
 let rs=data.reservas.filter(r=>
-
 String(r.fecha||'').startsWith(m)&&
-
 !String(r.estado||'').includes('Cancelada')
-
 );
-
 
 let pagadas=rs.filter(r=>
-String(r.estado||'').startsWith('Pagada')
+String(r.estado||'').startsWith('Pagada') &&
+Number(r.precio ?? data.price)>0
 );
-
 
 let total=pagadas.reduce(
-
-(a,r)=>
-a+Number(r.precio ?? data.price),
-
+(a,r)=>a+Number(r.precio ?? 0),
 0
-
 );
 
-
-$('total').textContent=
-'€'+total.toFixed(2);
-
-
-$('count').textContent=
-pagadas.length+
-' reservas cobradas';
-
+$('total').textContent='€'+total.toFixed(2);
+$('count').textContent=pagadas.length+' reservas cobradas';
 
 $('incomeRows').innerHTML=
-
 rs.map(r=>{
-
-let est=
-String(r.estado||'Pendiente');
-
-let pagada=
-est.startsWith('Pagada');
-
+let est=String(r.estado||'Pendiente');
+let precio=Number(r.precio ?? data.price);
+let pagada=est.startsWith('Pagada');
+let gratis=precio===0 || est==='Gratis';
 
 return `
-
 <tr>
-
 <td>${esc(r.fecha)}</td>
-
-<td>
-${esc(
-String(r.hora_inicio||'').slice(0,5)
-)}
-</td>
-
+<td>${esc(String(r.hora_inicio||'').slice(0,5))}</td>
 <td>${esc(r.nombre)}</td>
-
+<td>${esc(r.metodo_pago||'Gratis')}</td>
+<td>${gratis?'GRATIS':'€'+precio.toFixed(2)}</td>
 <td>
-${esc(r.metodo_pago||'Pendiente')}
+${gratis
+?'🆓 Gratis'
+:pagada
+?'💰 Pagada'
+:`<button onclick="marcarPagada('${esc(r.id)}')">💰 Marcar pagada</button>`}
 </td>
-
-<td>
-€${Number(
-r.precio ?? data.price
-).toFixed(2)}
-</td>
-
-<td>
-
-${
-pagada
-?
-'💰 Pagada'
-:
-`<button onclick="marcarPagada('${esc(r.id)}')">
-💰 Marcar pagada
-</button>`
-}
-
-</td>
-
 </tr>
-
 `;
-
 }).join('');
 
 }
