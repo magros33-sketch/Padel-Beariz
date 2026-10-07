@@ -923,6 +923,38 @@ async function cargarNube(){
 
 try{
 
+/* CARGAR SIEMPRE LA CONFIGURACIÓN ACTUAL DESDE SUPABASE
+   PARA QUE TODOS LOS DISPOSITIVOS VEAN LOS MISMOS HORARIOS. */
+let cfgResp=await fetch(
+SUPABASE_URL+'/rest/v1/configuracion?id=eq.1&select=precio_reserva,duracion_minutos,hora_apertura,hora_cierre',
+{
+headers:{
+apikey:SUPABASE_KEY,
+Authorization:'Bearer '+SUPABASE_KEY
+}
+}
+);
+
+if(!cfgResp.ok)
+throw Error(await cfgResp.text());
+
+const cfgRows=await cfgResp.json();
+const cfgNube=cfgRows?.[0];
+
+if(cfgNube){
+  data.price=Number(cfgNube.precio_reserva ?? data.price);
+  data.duration=Number(cfgNube.duracion_minutos) || data.duration || 90;
+  data.start=String(cfgNube.hora_apertura || data.start || '09:00').slice(0,5);
+  data.end=String(cfgNube.hora_cierre || data.end || '00:00').slice(0,5);
+
+  localStorage.setItem('padelConfig',JSON.stringify({
+    price:data.price,
+    duration:data.duration,
+    start:data.start,
+    end:data.end
+  }));
+}
+
 let r=await fetch(
 
 API+'?select=*&order=fecha.asc,hora_inicio.asc',
