@@ -96,6 +96,7 @@ Fecha
 <div class="card">
 
 <h2>Horarios</h2>
+<div id="temporadaLabel" style="margin:0 0 12px;text-align:center;font-size:16px;font-weight:800;color:#1e7a55">Invierno</div>
 
 <div id="infoReservaPrincipal" style="margin:12px 0;padding:14px 16px;border:3px solid #f2a900;border-radius:14px;background:#fff8dc;text-align:center;font-size:20px;font-weight:800">
 ⏱️ CADA RESERVA DURA <span id="durText">90</span> MINUTOS
@@ -195,6 +196,14 @@ Pago
 <h2>⚙️ Configuración</h2>
 
 <label>
+Temporada
+<select id="temporada">
+<option value="Invierno">Invierno</option>
+<option value="Verano">Verano</option>
+</select>
+</label>
+
+<label>
 Precio (€)
 <input id="price" type="number" min="0" step="0.50">
 </label>
@@ -266,7 +275,8 @@ price:12,
 duration:90,
 start:'09:00',
 end:'00:00',
-emailAdmin:'magros33@gmail.com'
+emailAdmin:'magros33@gmail.com',
+temporada:'Invierno'
 };
 
 
@@ -337,6 +347,7 @@ data.duration=Number(cfg.duration)||90;
 data.start=cfg.start||'09:00';
 data.end=cfg.end||'00:00';
 data.emailAdmin=cfg.emailAdmin||'magros33@gmail.com';
+data.temporada=cfg.temporada||'Invierno';
 
 }
 
@@ -945,7 +956,7 @@ try{
 /* CARGAR SIEMPRE LA CONFIGURACIÓN ACTUAL DESDE SUPABASE
    PARA QUE TODOS LOS DISPOSITIVOS VEAN LOS MISMOS HORARIOS. */
 let cfgResp=await fetch(
-SUPABASE_URL+'/rest/v1/configuracion?id=eq.1&select=precio_reserva,duracion_minutos,hora_apertura,hora_cierre,email_admin',
+SUPABASE_URL+'/rest/v1/configuracion?id=eq.1&select=precio_reserva,duracion_minutos,hora_apertura,hora_cierre,email_admin,temporada',
 {
 headers:{
 apikey:SUPABASE_KEY,
@@ -966,13 +977,15 @@ if(cfgNube){
   data.start=String(cfgNube.hora_apertura || data.start || '09:00').slice(0,5);
   data.end=String(cfgNube.hora_cierre || data.end || '00:00').slice(0,5);
   data.emailAdmin=cfgNube.email_admin||data.emailAdmin||'magros33@gmail.com';
+  data.temporada=cfgNube.temporada||data.temporada||'Invierno';
 
   localStorage.setItem('padelConfig',JSON.stringify({
     price:data.price,
     duration:data.duration,
     start:data.start,
     end:data.end,
-    emailAdmin:data.emailAdmin
+    emailAdmin:data.emailAdmin,
+    temporada:data.temporada
   }));
 }
 
@@ -1682,6 +1695,7 @@ const emailAdmin=$('emailAdmin').value.trim();
 if(!emailAdmin||!/^\S+@\S+\.\S+$/.test(emailAdmin))
 return alert('Introduce un correo válido para recibir los avisos.');
 data.emailAdmin=emailAdmin;
+data.temporada=$('temporada').value==='Verano'?'Verano':'Invierno';
 
 if(!Number.isFinite(precio)||precio<0)
 return alert('El precio no puede ser negativo.');
@@ -1720,7 +1734,8 @@ precio_reserva:data.price,
 duracion_minutos:data.duration,
 hora_apertura:data.start,
 hora_cierre:data.end,
-email_admin:data.emailAdmin
+email_admin:data.emailAdmin,
+temporada:data.temporada
 })
 })
 .then(async r=>{
@@ -1764,6 +1779,8 @@ $('start').value=data.start;
 
 $('end').value=data.end;
 if($('emailAdmin'))$('emailAdmin').value=data.emailAdmin||'magros33@gmail.com';
+if($('temporada'))$('temporada').value=data.temporada||'Invierno';
+if($('temporadaLabel'))$('temporadaLabel').textContent=data.temporada||'Invierno';
 
 
 renderSlots();
