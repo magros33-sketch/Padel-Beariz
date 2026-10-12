@@ -273,13 +273,35 @@ emailAdmin:'magros33@gmail.com'
 const $=id=>document.getElementById(id);
 
 
+/* FECHA Y HORA OFICIALES DE BEARIZ (independientes del móvil del usuario) */
+function partesHoraBeariz(ahora=new Date()){
+  const partes=new Intl.DateTimeFormat('en-GB',{
+    timeZone:'Europe/Madrid',
+    year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+  }).formatToParts(ahora);
+  return Object.fromEntries(partes.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+}
+function fechaBeariz(ahora=new Date()){
+  const p=partesHoraBeariz(ahora);
+  return p.year+'-'+p.month+'-'+p.day;
+}
+function mesBeariz(ahora=new Date()){
+  const p=partesHoraBeariz(ahora);
+  return p.year+'-'+p.month;
+}
+function minutosBeariz(ahora=new Date()){
+  const p=partesHoraBeariz(ahora);
+  return Number(p.hour)*60+Number(p.minute);
+}
+
 function init(){
 
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
 }
 
-const today=new Date().toISOString().slice(0,10);
+const today=fechaBeariz();
 
 $('viewDate').value=today;
 $('date').value=today;
@@ -289,8 +311,7 @@ localStorage.getItem('padelConfig')||'null'
 );
 
 if($('monthPick')){
-  const now=new Date();
-  $('monthPick').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  $('monthPick').value=mesBeariz();
 }
 
 const localPin=localStorage.getItem('padelPin');
@@ -487,8 +508,7 @@ render();
 
 function setToday(){
 
-$('viewDate').value=
-new Date().toISOString().slice(0,10);
+$('viewDate').value=fechaBeariz();
 
 renderSlots();
 
@@ -581,14 +601,7 @@ m=>({
 
 function esHoraPasada(d,t){
 
-const ahora=new Date();
-
-const hoy=
-ahora.getFullYear()+
-"-"+
-String(ahora.getMonth()+1).padStart(2,"0")+
-"-"+
-String(ahora.getDate()).padStart(2,"0");
+const hoy=fechaBeariz();
 
 if(d<hoy)return true;
 
@@ -596,8 +609,7 @@ if(d>hoy)return false;
 
 const [h,m]=t.split(":").map(Number);
 
-return h*60+m<=
-ahora.getHours()*60+ahora.getMinutes();
+return h*60+m<=minutosBeariz();
 
 }
 
