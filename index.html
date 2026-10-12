@@ -228,6 +228,11 @@ Fin
 <input id="end" type="time">
 </label>
 
+<label>
+Correo para avisos de reservas y cancelaciones
+<input id="emailAdmin" type="email" placeholder="correo@ejemplo.com">
+</label>
+
 <button onclick="saveConfig()">
 Guardar configuración
 </button>
@@ -260,7 +265,8 @@ reservas:[],
 price:12,
 duration:90,
 start:'09:00',
-end:'00:00'
+end:'00:00',
+emailAdmin:'magros33@gmail.com'
 };
 
 
@@ -309,6 +315,7 @@ data.price=Number.isFinite(Number(cfg.price)) ? Number(cfg.price) : 12;
 data.duration=Number(cfg.duration)||90;
 data.start=cfg.start||'09:00';
 data.end=cfg.end||'00:00';
+data.emailAdmin=cfg.emailAdmin||'magros33@gmail.com';
 
 }
 
@@ -926,7 +933,7 @@ try{
 /* CARGAR SIEMPRE LA CONFIGURACIÓN ACTUAL DESDE SUPABASE
    PARA QUE TODOS LOS DISPOSITIVOS VEAN LOS MISMOS HORARIOS. */
 let cfgResp=await fetch(
-SUPABASE_URL+'/rest/v1/configuracion?id=eq.1&select=precio_reserva,duracion_minutos,hora_apertura,hora_cierre',
+SUPABASE_URL+'/rest/v1/configuracion?id=eq.1&select=precio_reserva,duracion_minutos,hora_apertura,hora_cierre,email_admin',
 {
 headers:{
 apikey:SUPABASE_KEY,
@@ -946,12 +953,14 @@ if(cfgNube){
   data.duration=Number(cfgNube.duracion_minutos) || data.duration || 90;
   data.start=String(cfgNube.hora_apertura || data.start || '09:00').slice(0,5);
   data.end=String(cfgNube.hora_cierre || data.end || '00:00').slice(0,5);
+  data.emailAdmin=cfgNube.email_admin||data.emailAdmin||'magros33@gmail.com';
 
   localStorage.setItem('padelConfig',JSON.stringify({
     price:data.price,
     duration:data.duration,
     start:data.start,
-    end:data.end
+    end:data.end,
+    emailAdmin:data.emailAdmin
   }));
 }
 
@@ -1014,6 +1023,20 @@ $('cloudStatus').className=
 
 render();
 
+}
+
+
+async function enviarAvisoCorreo(reservaId,tipo){
+try{
+const r=await fetch(SUPABASE_URL+'/functions/v1/send-admin-notification',{
+method:'POST',
+headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},
+body:JSON.stringify({reserva_id:Number(reservaId),tipo})
+});
+const result=await r.json().catch(()=>({}));
+if(!r.ok)throw Error(result.error||result.message||('HTTP '+r.status));
+return true;
+}catch(e){console.error('No se pudo enviar el aviso por correo:',e);return false;}
 }
 
 
@@ -1103,7 +1126,11 @@ body:JSON.stringify(r)
 
 if(!resp.ok)
 throw Error(await resp.text());
-
+const guardada=await resp.json().catch(()=>[]);
+if(Array.isArray(guardada)&&guardada[0]&&guardada[0].id){
+const enviado=await enviarAvisoCorreo(guardada[0].id,'reserva');
+if(!enviado)console.warn('La reserva quedó guardada, pero el correo no se confirmó.');
+}
 
 alert('Reserva registrada');
 
@@ -1242,8 +1269,10 @@ if(!rpta.ok)
 throw Error(await rpta.text());
 
 
-alert(
-'Solicitud enviada al administrador.\n\nEl administrador ha recibido el aviso.'
+const avisoEnviado=await enviarAvisoCorreo(id,'cancelacion');
+alert(avisoEnviado
+?'Solicitud enviada al administrador.\n\nSe ha enviado el aviso por correo.'
+:'Solicitud enviada al administrador.\n\nNo se pudo confirmar el correo; revisa la configuración de avisos.'
 );
 
 
@@ -1342,10 +1371,10 @@ throw Error(await r.text());
 
 
 await cargarNube();
-
-
-alert(
-'Reserva cancelada correctamente.'
+const avisoEnviado=await enviarAvisoCorreo(id,'cancelacion');
+alert(avisoEnviado
+?'Reserva cancelada correctamente. Se envió el aviso por correo.'
+:'Reserva cancelada correctamente, pero no se pudo confirmar el correo.'
 );
 
 
@@ -1637,6 +1666,10 @@ return alert(
 );
 
 const precio=Number($('price').value);
+const emailAdmin=$('emailAdmin').value.trim();
+if(!emailAdmin||!/^\S+@\S+\.\S+$/.test(emailAdmin))
+return alert('Introduce un correo válido para recibir los avisos.');
+data.emailAdmin=emailAdmin;
 
 if(!Number.isFinite(precio)||precio<0)
 return alert('El precio no puede ser negativo.');
@@ -1674,7 +1707,8 @@ body:JSON.stringify({
 precio_reserva:data.price,
 duracion_minutos:data.duration,
 hora_apertura:data.start,
-hora_cierre:data.end
+hora_cierre:data.end,
+email_admin:data.emailAdmin
 })
 })
 .then(async r=>{
@@ -1717,6 +1751,7 @@ $('duration').value=data.duration;
 $('start').value=data.start;
 
 $('end').value=data.end;
+if($('emailAdmin'))$('emailAdmin').value=data.emailAdmin||'magros33@gmail.com';
 
 
 renderSlots();
