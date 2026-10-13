@@ -1,6 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="112" fill="#123b2a"/>
-<circle cx="256" cy="256" r="170" fill="#ffffff"/>
-<path d="M170 145c55 34 86 80 86 111s-31 77-86 111" fill="none" stroke="#123b2a" stroke-width="18" stroke-linecap="round"/>
-<path d="M342 145c-55 34-86 80-86 111s31 77 86 111" fill="none" stroke="#123b2a" stroke-width="18" stroke-linecap="round"/>
+<rect width="512" height="512" rx="104" fill="#06472d"/>
+<g transform="rotate(35 255 250)">
+<rect x="228" y="300" width="56" height="151" rx="22" fill="#fff"/>
+<path d="M256 70C163 70 127 137 127 220c0 75 46 123 101 144h56c55-21 101-69 101-144 0-83-36-150-129-150Z" fill="#fff"/>
+<path d="M228 364l28-31 28 31Z" fill="#06472d"/>
+<g fill="#06472d">
+<circle cx="176" cy="135" r="10"/><circle cx="216" cy="135" r="10"/><circle cx="256" cy="135" r="10"/><circle cx="296" cy="135" r="10"/><circle cx="336" cy="135" r="10"/>
+<circle cx="176" cy="175" r="10"/><circle cx="216" cy="175" r="10"/><circle cx="256" cy="175" r="10"/><circle cx="296" cy="175" r="10"/><circle cx="336" cy="175" r="10"/>
+<circle cx="176" cy="215" r="10"/><circle cx="216" cy="215" r="10"/><circle cx="256" cy="215" r="10"/><circle cx="296" cy="215" r="10"/><circle cx="336" cy="215" r="10"/>
+<circle cx="176" cy="255" r="10"/><circle cx="216" cy="255" r="10"/><circle cx="256" cy="255" r="10"/><circle cx="296" cy="255" r="10"/><circle cx="336" cy="255" r="10"/>
+<circle cx="176" cy="295" r="10"/><circle cx="216" cy="295" r="10"/><circle cx="256" cy="295" r="10"/><circle cx="296" cy="295" r="10"/><circle cx="336" cy="295" r="10"/>
+</g></g>
+<circle cx="389" cy="369" r="69" fill="#d7ff13"/>
+<path d="M358 311c42 18 52 59 32 117M429 331c-40 17-57 47-51 99" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
 </svg>
