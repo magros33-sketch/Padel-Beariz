@@ -22,8 +22,11 @@ button.active{background:#f2a900}
 .warning{background:#fff0c2!important;border-color:#e5a900!important}
 .card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
-.slot{padding:14px;border-radius:12px;background:#e7f4ed;border:1px solid #b9ddca}
-.slot.busy{background:#ffe5e5;border-color:#f4b3b3}
+.slot{padding:14px;border-radius:12px;background:#f4f7f5;border:1px solid #ccd5cf}
+.slot.busy{background:#dff4e7;border-color:#79bd94}
+.card.reservation-booked{background:#dff4e7;border:1px solid #79bd94}
+.card.reservation-cancelled{background:#ffe5e5;border:1px solid #f4b3b3}
+.reservation-cancelled .small{color:#8b211b}
 .slot.cancel-request{background:#fff0c2;border-color:#e5a900}
 .small{font-size:13px;color:#68746d}
 .hidden{display:none}
@@ -679,7 +682,7 @@ solicitud
 let texto=
 solicitud
 ?'🟠 SOLICITUD DE CANCELACIÓN'
-:'🔴 Ocupado';
+:'🟢 Ocupado';
 
 
 return `
@@ -746,7 +749,7 @@ return `
 
 <b>${t}</b><br>
 
-🟢 Disponible<br>
+⚪ Disponible<br>
 
 <button onclick="reserveAt('${d}','${t}')">
 Reservar
@@ -761,9 +764,7 @@ Reservar
 
 let rs=data.reservas.filter(x=>
 
-String(x.fecha||'')===d &&
-
-String(x.estado||'')!=='Cancelada'
+String(x.fecha||'')===d
 
 );
 
@@ -782,10 +783,14 @@ String(r.estado||'Pendiente');
 let solicitud=
 estado.includes('Solicitud de cancelación');
 
+let cancelada=estado==='Cancelada';
+
 let clase=
-solicitud
+cancelada
+?'card reservation-cancelled'
+:solicitud
 ?'card warning'
-:'card';
+:'card reservation-booked';
 
 return `
 
@@ -802,10 +807,11 @@ ${esc(String(r.hora_fin||'').slice(0,5))}
 <br>
 
 ${
-solicitud
-?
-'<strong>🟠 SOLICITUD DE CANCELACIÓN</strong><br>'
-:''
+cancelada
+?'<strong>🔴 CANCELADA</strong><br>'
+:solicitud
+?'<strong>🟠 SOLICITUD DE CANCELACIÓN</strong><br>'
+:'<strong>🟢 TOMADA</strong><br>'
 }
 
 <span class="small">
@@ -820,6 +826,7 @@ solicitud
 
 <br>
 
+${cancelada?'':`
 <button onclick="solicitarCancelacion('${esc(r.id)}','${esc(r.telefono||'')}')">
 Solicitar cancelación
 </button>
@@ -833,6 +840,7 @@ Cancelar
 </button>`
 :''
 }
+`}
 
 </div>
 
@@ -920,7 +928,7 @@ if(ocupada){
 
 return `
 <option value="${t}" disabled>
-${t} — 🔴 Ocupada
+${t} — 🟢 Ocupada
 </option>
 `;
 
@@ -940,7 +948,7 @@ ${t} — ⚪ Pasada
 
 return `
 <option value="${t}">
-${t} — 🟢 Disponible
+${t} — ⚪ Disponible
 </option>
 `;
 
